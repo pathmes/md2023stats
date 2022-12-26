@@ -1,0 +1,95 @@
+---
+title: "Statistics 1 & 2"
+author: "Prof A Pathmeswaran<br>pathmes@kln.ac.lk<br>2023-01-31"
+format: 
+  revealjs:
+   theme: [default, custom.scss]
+   footer: "MD Community Medicine 2023"
+
+---
+
+```{r}
+#| label: load-packages
+suppressMessages(library(tidyverse))
+suppressMessages(library(readr))
+suppressMessages(library(broom))
+suppressMessages(library(flextable))
+suppressMessages(library(huxtable))
+```
+
+## Aim
+
+- To enable students to comprehend, apply and interpret the results of a range of advanced techniques
+for the design and analysis of epidemiological studies.  
+
+## Objectives  
+
+- Be able to:  
+
+    1. describe the basis of relevant statistical tests with underlying assumptions in the analysis of epidemiological data  
+    2. develop skill of applying appropriate statistical and computational methods in the current scientific applications  
+    3. interpret and critique the statistical applications used in relevant literature  
+
+## Outline
+
+- Parametric tests:
+    a. T-test: paired & independent t-test
+    b. Chi-squared test
+    c. Z-test for means and proportions
+    d. Estimation of population parameters
+    e. Assessing normal distribution
+
+## Q1
+A researcher claims to have developed a herbal product to prevent complications of dengue.  The use of this product early in the illness for five days had resulted in a 10% increase in the platelet count.  
+
+1) List all relevant information needed to assess the validity of this claim.
+
+## Q1 - Summary data
+The above claim was based on an observational study of 30 patients with dengue fever (antigen test positive).  The platelet values on day 0 and day 5 are summarised below - 
+
+set_number_format(ht, row, col, value )
+```{r}
+#| label: q1-data
+#| echo: false
+#| warning: false
+#| message: false
+
+q0l <- read_csv(here::here("data", "q0l.csv"))
+t1 <- q0l %>%
+  group_by(Day) %>%
+  summarise(mean = mean(Platelets), sd = sd(Platelets))
+
+huxtable(t1) %>% 
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_number_format(row = everywhere, col = 3, value = "%5.1f" ) %>%   
+set_width(0.8) %>%
+set_caption("Platelets on Day 0 and Day 5 - Summary ")
+
+```
+
+
+## Q1 analysis 1
+
+```{r}
+#| label: q1-analysis1
+#| echo: false
+#| warning: false
+#| message: false
+
+q0data <- read_csv(here::here("data", "q0data.csv"))
+t1 <- tidy(t.test(q0data$plt_d5, q0data$plt_d0, paired = FALSE, var.equal = TRUE)) 
+
+t1[ , 1:6] %>%   
+huxtable() %>% 
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_width(0.8) 
+ 
+t1[ , 7:9] %>% 
+ huxtable() %>% 
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_width(0.8)
+
+```
