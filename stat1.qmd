@@ -47,7 +47,7 @@ A researcher claims to have developed a herbal product to prevent complications 
 ## Q1 - Summary data
 The above claim was based on an observational study of 30 patients with dengue fever (antigen test positive).  The platelet values on day 0 and day 5 are summarised below - 
 
-set_number_format(ht, row, col, value )
+
 ```{r}
 #| label: q1-data
 #| echo: false
@@ -93,3 +93,111 @@ set_bottom_border(row = 1, col = everywhere) %>%
 set_width(0.8)
 
 ```
+
+## Q1 analysis 2
+
+```{r}
+#| label: q1-analysis2
+#| echo: false
+#| warning: false
+#| message: false
+
+t1 <- tidy(t.test(q0data$plt_d5, q0data$plt_d0, paired = FALSE, var.equal = FALSE))
+
+t1[ , 1:6] %>%   
+huxtable() %>% 
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_width(0.8) 
+ 
+t1[ , 7:9] %>% 
+ huxtable() %>% 
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_width(0.8)
+
+```
+
+## How many types of t tests are there?
+- Describe the different types of t tests
+
+## Q1 - Summary data 2
+
+
+
+```{r}
+#| label: q1-data2
+#| echo: false
+#| warning: false
+#| message: false
+
+q0l <- read_csv(here::here("data", "q0l.csv"))
+t1 <- q0l %>%
+  group_by(Day) %>%
+  summarise(mean = mean(Platelets), sd = sd(Platelets))
+
+huxtable(t1) %>% 
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_number_format(row = everywhere, col = 3, value = "%5.1f" ) %>%  
+set_width(0.8) 
+
+q0w <- read_csv(here::here("data", "q0data.csv"))
+t12 <- q0w %>% 
+  summarise(Diff_m = mean(diff), Diff_sd = sd(diff))
+
+huxtable(t12) %>%
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_number_format(row = 2, col = everywhere, value = "%5.1f" ) %>%
+set_width(0.8)
+```
+
+## Results of one sample t tests
+
+- Mean difference = 0 (Null hypothesis)
+```{r}
+#| label: q1-analysis3
+#| echo: false
+#| warning: false
+#| message: false
+
+t2 <- tidy(t.test(q0data$diff, mu = 0)) 
+  t2[ , 1:4] %>%   
+huxtable() %>% 
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_width(0.8) 
+ 
+t2[ , 5:7] %>%
+ huxtable() %>%
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_width(0.8)
+
+```
+
+## Results of paired t test
+
+```{r}
+#| label: q1-analysis4
+#| echo: false
+#| warning: false
+#| message: false
+
+q0l <- read_csv(here::here("data", "q0l.csv"))
+t4 <- tidy(t.test(q0l$Platelets~q0l$Day, paired = TRUE)) 
+
+  t4[ , 1:4] %>%   
+huxtable() %>% 
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_width(0.8) 
+ 
+t4[ , 5:7] %>%
+ huxtable() %>%
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_width(0.8)
+```
+
