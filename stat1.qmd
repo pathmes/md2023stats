@@ -5,7 +5,6 @@ format:
   revealjs:
    theme: [default, custom.scss]
    footer: "MD Community Medicine 2023"
-
 ---
 
 ```{r}
@@ -19,34 +18,34 @@ suppressMessages(library(huxtable))
 
 ## Aim
 
-- To enable students to comprehend, apply and interpret the results of a range of advanced techniques
-for the design and analysis of epidemiological studies.  
+-   To enable students to comprehend, apply and interpret the results of a range of advanced techniques for the design and analysis of epidemiological studies.
 
-## Objectives  
+## Objectives
 
-- Be able to:  
+-   Be able to:
 
-    1. describe the basis of relevant statistical tests with underlying assumptions in the analysis of epidemiological data  
-    2. develop skill of applying appropriate statistical and computational methods in the current scientific applications  
-    3. interpret and critique the statistical applications used in relevant literature  
+    1.  describe the basis of relevant statistical tests with underlying assumptions in the analysis of epidemiological data\
+    2.  develop skill of applying appropriate statistical and computational methods in the current scientific applications\
+    3.  interpret and critique the statistical applications used in relevant literature
 
 ## Outline
 
-- Parametric tests:
-    a. T-test: paired & independent t-test
-    b. Chi-squared test
-    c. Z-test for means and proportions
-    d. Estimation of population parameters
-    e. Assessing normal distribution
+-   Parametric tests:
+    a.  T-test: paired & independent t-test
+    b.  Chi-squared test
+    c.  Z-test for means and proportions
+    d.  Estimation of population parameters
+    e.  Assessing normal distribution
 
 ## Q1
-A researcher claims to have developed a herbal product to prevent complications of dengue.  The use of this product early in the illness for five days had resulted in a 10% increase in the platelet count.  
 
-1) List all relevant information needed to assess the validity of this claim.
+A researcher claims to have developed a herbal product to prevent complications of dengue. The use of this product early in the illness for five days had resulted in a 10% increase in the platelet count.
+
+1)  List all relevant information needed to assess the validity of this claim.
 
 ## Q1 - Summary data
-The above claim was based on an observational study of 30 patients with dengue fever (antigen test positive).  The platelet values on day 0 and day 5 are summarised below - 
 
+The above claim was based on an observational study of 30 patients with dengue fever (antigen test positive). The platelet values on day 0 and day 5 are summarised below -
 
 ```{r}
 #| label: q1-data
@@ -67,7 +66,6 @@ set_width(0.8) %>%
 set_caption("Platelets on Day 0 and Day 5 - Summary ")
 
 ```
-
 
 ## Q1 analysis 1
 
@@ -119,11 +117,10 @@ set_width(0.8)
 ```
 
 ## How many types of t tests are there?
-- Describe the different types of t tests
+
+-   Describe the different types of t tests
 
 ## Q1 - Summary data 2
-
-
 
 ```{r}
 #| label: q1-data2
@@ -155,7 +152,8 @@ set_width(0.8)
 
 ## Results of one sample t tests
 
-- Mean difference = 0 (Null hypothesis)
+-   Mean difference = 0 (Null hypothesis)
+
 ```{r}
 #| label: q1-analysis3
 #| echo: false
@@ -188,6 +186,30 @@ set_width(0.8)
 q0l <- read_csv(here::here("data", "q0l.csv"))
 t4 <- tidy(t.test(q0l$Platelets~q0l$Day, paired = TRUE)) 
 
+t4[ , 1:4] %>%   
+huxtable() %>% 
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_width(0.8) 
+ 
+t4[ , 5:7] %>%
+ huxtable() %>%
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_width(0.8)
+```
+
+## Results of paired t test
+
+```{r}
+#| label: q1-analysis4r
+#| echo: false
+#| warning: false
+#| message: false
+
+q0data <- read_csv(here::here("data", "q0data.csv"))
+t4 <- tidy(t.test(Pair(plt_d5, plt_d0) ~ 1, data = q0data)) 
+
   t4[ , 1:4] %>%   
 huxtable() %>% 
   set_bold(row = 1, col = everywhere) %>%
@@ -201,3 +223,83 @@ set_bottom_border(row = 1, col = everywhere) %>%
 set_width(0.8)
 ```
 
+## Scientific Notation {.larger}
+
+**Scientific Notation**
+
+P value = `r format(t4$p.value, scientific = TRUE)`
+
+**Decimal Form**
+
+P value = `r format(t4$p.value, scientific = FALSE)`
+
+## Data from a clinical trial
+
+```{r }
+#| label: yop-data
+#| echo: FALSE
+ 
+yop <- tribble(
+~status, ~charcoal, ~ placebo,
+"Dead", 5,           16,
+"Alive", 196,        184,
+"Total", 201,        200
+)
+yop %>% 
+kableExtra::kbl()
+
+
+```
+
+de Silva, H.A., Fonseka, M.M.D., Pathmeswaran, A., Alahakone, D.G.S., Ratnatilake, G.A., Gunatilake, S.B., Ranasinha, C.D., Lalloo, D.G., Aronson, J.K., de Silva, H.J., 2003.\
+Multiple-dose activated charcoal for treatment of yellow oleander poisoning: a single-blind, randomised, placebo-controlled trial. Lancet 361, 1935--1938.
+
+## Chi Squared Test
+
+```{r }
+#| echo: false
+#| label: chi-sqr
+tidy(chisq.test(yop[1:2, 2:3])) %>% 
+  mutate_if(is.numeric, format, digits = 3) %>% 
+ kableExtra::kbl() %>% 
+  kableExtra::kable_styling(latex_options = c("scale_down"))  
+
+```
+
+-   Conditions for the Chi squared test?\
+-   Is Chi squared a parametric test?
+
+## Observed and Expected Values
+
+```{r }
+#| label: chi-sq-expct
+#| echo: false
+  
+yop %>% 
+kableExtra::kbl()
+
+chisq.test(yop[1:2, 2:3])$expected %>% 
+   kableExtra::kbl(digits = 1)  
+
+```
+
+## Comparing Two Proportions
+
+```{r }
+#| label: two-prop
+#| echo: false
+x1 <- c(yop$placebo[1], yop$charcoal[1])
+n1 <- c(yop$placebo[3], yop$charcoal[3])
+
+t5 <- tidy(prop.test(x1, n1))
+
+t5[ , 1:4] %>%   
+huxtable() %>% 
+  set_bold(row = 1, col = everywhere) %>%
+set_bottom_border(row = 1, col = everywhere) %>%
+set_width(0.8) 
+
+```
+
+Difference: `r round((t5$estimate1 - t5$estimate2), 3)`\
+95% CI: `r round(t5$conf.low, 3)` - `r round(t5$conf.high, 3)`
