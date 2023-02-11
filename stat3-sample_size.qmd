@@ -1,0 +1,272 @@
+---
+title: "Sample Size Calculation"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2023-01-31"
+format: 
+  revealjs:
+   theme: [default, custom.scss]
+   footer: "MD Community Medicine 2023"
+   embed-resources: false
+   standalone: false
+---
+
+## Outline
+
+1. Properties of samples  
+2. Confidence intervals & P values  
+3. Type I error (level of significance)  
+4. Type II error (power)
+5. Impotance of calculating sample size
+6. Calculating sample size for  
+   - Descriptive studies  
+   - Cross sectional analytical studies 
+   - Case control studies, Cohort studies & Clinical trials  
+7. Presenting sample size calculation
+8. Common mistakes  
+
+
+## Estimating population parameter
+- If we take a large sample will the sample mean be exactly equal to the population mean?  
+- If we take two large samples of equal size will the two sample means be exactly the same?  
+- If we calculate the mean value by measuring everyone in the population and repeat the process will we get the same value?  
+
+
+
+
+
+
+```{r include = FALSE}
+source('sim_sample_V1.0.R')
+
+```
+
+## Properties of samples
+```{r}
+hist(a, 10,
+     col = "lightgray",
+     main = "Distribution of Marks (N = 10, 000)",
+     sub = paste("Mean = ", round(mean(a),1),
+                 "SD = ", round(sd(a),1)),
+     xlab = "Marks")
+```
+
+## Samples of size 64; Number of repetitions 100
+```{r}
+hist(r64100, 11,
+     col = "lightgray",
+     main = "Distribution of Sample Means (N = 100)",
+     sub = paste0("Mean of sample means = ", round(mean(r64100),1),
+                  ";  ",
+                 "SD of sample means = ", round(sd(r64100),2),
+                 ";  ",
+                 "Size of samples = 64"),
+     xlab = "")
+```
+  
+   
+## Samples of size 64; Number of repetitions 100
+```{r}
+
+knitr::kable(s64r100, digits = c(0, 1, 1, 1, 1))  
+```
+  
+What will be the minimum value of the sample means if we repeat this process 1000 times?  
+It will be    
+1. Lower than 45.0  
+2. Higher than 45.0  
+3. Cannot be predicted  
+
+## Samples of size 64; Number of repetitions 1000
+```{r}
+hist(r641000, 20,
+     col = "lightgray",
+     main = "Distribution of Sample Means (N = 1000)",
+     sub = paste0("Mean of sample means = ", round(mean(r641000),1),
+                  ";  ",
+                  "SD of sample means = ", round(sd(r641000),2),
+                  ";  ",
+                  "Size of samples = 64"),
+     xlab = "")
+
+```
+
+## Samples of size 64; Number of repetitions 1000
+```{r}
+knitr::kable(s64r1000, digits = c(0, 1, 1, 1, 1))
+```
+
+## Samples of size 64; Number of repetitions 100
+```{r}
+
+knitr::kable(s64r100, digits = c(0, 1, 1, 1, 1))   
+```
+  
+What will be the minimum value of the sample means if we repeat this process 100 times with a sample size of 256?   
+It will be    
+1. Lower than 45.0  
+2. Higher than 45.0  
+3. Cannot be predicted  
+
+## Sample size 256 & repetitions 100
+```{r}
+
+hist(r256100, 7,
+     col = "lightgray",
+     main = "Distribution of Sample Means (N = 100)",
+     sub = paste0("Mean of sample means = ", round(mean(r256100),1),
+                  ";  ",
+                  "SD of sample means = ", round(sd(r256100),2),
+                  ";  ",
+                  "Size of samples = 256"),
+     xlab = "")
+```
+
+## Sample size 256 & repetitions 100
+```{r}
+knitr::kable(s256r100, digits = c(0, 1, 1, 1, 1))  
+```
+## Sample size 256 & repetitions 1000
+```{r}
+knitr::kable(s256r1000, digits = c(0, 1, 1, 1, 1))  
+```
+
+## Summary of simulation
+```{r}
+knitr::kable(z, digits = c(0, 0, 1, 1, 1, 1))  
+```
+
+## Estimation and Inference
+
+- We are not interested in the sample statistics for their own sake.  
+- We are interested in the population parameter
+  + Confidence interval or
+  + P value  
+
+## 95% Confidence Interval  
+
+- We know that the mean calculated from repeat samples of the same size form a Normal distribution.  
+- The mean of these means will be equal to the population mean and the standard deviation of these sample means is called the standard error. 
+- Therefore, 95% of sample means will be within 1.96 standard errors of the population mean.  
+- The probability of any particular sample mean being within 1.96 standard errors of the population mean is 95%.  
+  
+## Type I Error and the Level of Significance 
+- The probability of of rejecting a true null hypothesis.  
+- This is equal to the P value.   
+- We can reduce the probability of making a type I error by making P < 0.01 the level of significance.  
+
+## Type II Error and Power
+- Even when there is a difference between the means of two groups we may fail to detect this difference (fail to reject the null hypothesis) in a particular study.  
+- The probability of not being able to detect a true difference is called the Type II error.   
+- We fail to reject the null hypothesis due to not having enough evidence against the null hypothesis.   
+- A common reason for this is inadequate sample size.  
+
+## Impotance of calculating sample size  
+- Inadequate sample size leads to inconclusive results.  
+- Unnecessarily large sample size leads to waste of resources.  
+- When should we calculate the sample size?  
+  + At the time of protocol development  
+  + Consider it along with the objectives  
+  
+## How to calculate?
+- Use formulae and calculate  
+  + Using a calculator or MS Excel - Risky and not reproducible
+- Use appropriate software  
+  + Winpepi
+  + OpenEpi
+  + Many others ....  
+- Use published tables
+  + Lwanga & Lemeshow
+
+## Sample Size Calculation for a Descriptive Study
+
+- To determine a mean or percentage along with the 95% confidence interval.  
+
+- Is the 95% confidence interval acceptable?  
+
+## Sample Size Calculation for a Descriptive Study
+
+- To determine a percentage along with the 95% confidence interval.
+- Expected percentage 50%
+- Desired 95% CI 45% to 55%
+
+
+
+Is the 95% confidence interval acceptable?
+
+
+What if you can afford only a particular sample size?   
+
+Can we go ahead and do a prevalence study if the maximum possible sample size is 200?
+
+## What if you can afford only 200 participants? 
+```{r}
+a <- binom.test(10, 200)
+print(paste0("If the prevalence is ", round(a$estimate*100,1), "%", ", the 95% CI will be from ", round(a$conf.int[1]*100, 1), " to ", round(a$conf.int[2]*100, 1)))  
+a <- binom.test(20, 200)
+print(paste0("If the prevalence is ", round(a$estimate*100,1), "%", ", the 95% CI will be from ", round(a$conf.int[1]*100, 1), " to ", round(a$conf.int[2]*100, 1)))  
+a <- binom.test(50, 200)
+print(paste0("If the prevalence is ", round(a$estimate*100,1), "%", ", the 95% CI will be from ", round(a$conf.int[1]*100, 1), " to ", round(a$conf.int[2]*100, 1)))  
+a <- binom.test(100, 200)
+print(paste0("If the prevalence is ", round(a$estimate*100,1), "%", ", the 95% CI will be from ", round(a$conf.int[1]*100, 1), " to ", round(a$conf.int[2]*100, 1)))
+
+```
+## Sample Size Calculation for Analytical Studies
+- Cross sectional  
+- Cohort  
+- Case control  
+- Clinical trial
+- All these can be expressed as difference between two proportions
+- Cross sectional study & Clinical trial can be difference between means.  
+
+## Analytical study
+- Level of significance (usually 0.05)
+- Power (either 80% or 90%)
+- Expected difference  
+- Difference between two means
+  + Estimates of the two standard deviations
+- Difference between two proportion
+  + Estimates of the two proportions
+
+## Sample size Calculation for a Case Control Study  
+"We wanted to identify factors that doubled the risk of home deliveries and had 50% prevalence in the community. Sample size was determined using Epi Info version 6. With 95% confidence and power of 80%, the calculated minimum sample size was 111 cases and 222 controls."  
+					(Lukumar 2006)  
+					
+## Sample size Calculation for a Clinical Trial
+- Treatment of metastatic prostate cancer  
+- Orchidectomy vs Orchidectomy + Drug A  
+- Outcome - Time to recurrence (Increase in PSA)
+- Follow up - 18 months
+- Information needed?  
+
+
+## Sample size Calculation for a Clinical Trial
+- Treatment of metastatic prostate cancer  
+- Orchidectomy vs Orchidectomy + Drug A  
+- Outcome - Time to recurrence (Increase in PSA)
+- Follow up - 18 months
+- Information needed?  
+
+Information needed - % with recurrence  following Orchidectomy in 18 months & improvement expected by adding Drug A  
+
+## Other issues
+- Design effect  
+- Unequal size groups
+- More than two groups  
+
+## Writing it up 
+- From -Statistics Guide for Research Grant Applicants
+- A sample of 324 patients with asthma will be required to obtain a 95% confidence interval of +/- 5% around a prevalence estimate of 30%. To allow for an expected 70% response rate to the questionnaire, a total of 480 questionnaires will be delivered.
+
+http://www-users.york.ac.uk/~mb55/guide/size.htm#est
+
+## Another example
+- A sample size of 292 babies (146 in each of the treatment and placebo groups) will be sufficient to detect a difference of 16% between groups in the sepsis rate at 14 days, with 80% power and a 5% significance level. This 16% difference represents the difference between a 50% sepsis rate in the placebo group and a 34% rate in the treatment group.
+
+http://www-users.york.ac.uk/~mb55/guide/size.htm#est
+
+## Other useful sources
+- CONSORT and other guidelines
+- Protocol papers
+- Clinical trial protocols  
+
+
+https://pathmes.github.io/Sample-Size-Home/
