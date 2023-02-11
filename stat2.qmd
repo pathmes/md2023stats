@@ -128,10 +128,7 @@ H    | X | X | X | X | X | X |
 T    | X | X | X | X | 0 | 0 |
 
 
-## Monty Hall Puzzle
 
-
-<https://montyhall.io/>
 
 ## Conditional probability
 
@@ -143,7 +140,7 @@ scrd <- tribble(
   "Total", 100, 900, 1000
 )
 
-flextable::flextable(scrd)
+kableExtra::kable(scrd)
 ```
 
 \  
