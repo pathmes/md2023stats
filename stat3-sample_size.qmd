@@ -1,15 +1,15 @@
 ---
 title: "Sample Size Calculation"
-author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2023-01-31"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2023-02-13"
 format: 
   revealjs:
    theme: [default, custom.scss]
    footer: "MD Community Medicine 2023"
-   embed-resources: false
-   standalone: false
+   embed-resources: true
+   standalone: true
 ---
 
-## Outline
+## Outline {.smaller}
 
 1. Properties of samples  
 2. Confidence intervals & P values  
@@ -24,7 +24,7 @@ format:
 8. Common mistakes  
 
 
-## Estimating population parameter
+## Estimating a population parameter
 - If we take a large sample will the sample mean be exactly equal to the population mean?  
 - If we take two large samples of equal size will the two sample means be exactly the same?  
 - If we calculate the mean value by measuring everyone in the population and repeat the process will we get the same value?  
@@ -49,7 +49,8 @@ hist(a, 10,
      xlab = "Marks")
 ```
 
-## Samples of size 64; Number of repetitions 100
+## Samples of size 64
+### Number of repetitions 100
 ```{r}
 hist(r64100, 11,
      col = "lightgray",
@@ -63,19 +64,21 @@ hist(r64100, 11,
 ```
   
    
-## Samples of size 64; Number of repetitions 100
+## Samples of size 64
+### Number of repetitions 100
 ```{r}
 
 knitr::kable(s64r100, digits = c(0, 1, 1, 1, 1))  
 ```
   
-What will be the minimum value of the sample means if we repeat this process 1000 times?  
+What will be the minimum value of the sample means if we repeat this process **1000** times?  
 It will be    
 1. Lower than 45.0  
 2. Higher than 45.0  
 3. Cannot be predicted  
 
-## Samples of size 64; Number of repetitions 1000
+## Samples of size 64
+### Number of repetitions 1000
 ```{r}
 hist(r641000, 20,
      col = "lightgray",
@@ -89,18 +92,20 @@ hist(r641000, 20,
 
 ```
 
-## Samples of size 64; Number of repetitions 1000
+## Samples of size 64
+### Number of repetitions 1000
 ```{r}
 knitr::kable(s64r1000, digits = c(0, 1, 1, 1, 1))
 ```
 
-## Samples of size 64; Number of repetitions 100
+## Samples of size 64
+### Number of repetitions 100
 ```{r}
 
 knitr::kable(s64r100, digits = c(0, 1, 1, 1, 1))   
 ```
   
-What will be the minimum value of the sample means if we repeat this process 100 times with a sample size of 256?   
+What will be the minimum value of the sample means if we repeat this process 100 times with a sample size of **256**?   
 It will be    
 1. Lower than 45.0  
 2. Higher than 45.0  
@@ -226,6 +231,11 @@ print(paste0("If the prevalence is ", round(a$estimate*100,1), "%", ", the 95% C
 - Difference between two proportion
   + Estimates of the two proportions
 
+## Increasing power without increasing sample size
+
+1. How to do do it?  
+2. What are the consequences?  
+
 ## Sample size Calculation for a Case Control Study  
 "We wanted to identify factors that doubled the risk of home deliveries and had 50% prevalence in the community. Sample size was determined using Epi Info version 6. With 95% confidence and power of 80%, the calculated minimum sample size was 111 cases and 222 controls."  
 					(Lukumar 2006)  
@@ -256,12 +266,19 @@ Information needed - % with recurrence  following Orchidectomy in 18 months & im
 - From -Statistics Guide for Research Grant Applicants
 - A sample of 324 patients with asthma will be required to obtain a 95% confidence interval of +/- 5% around a prevalence estimate of 30%. To allow for an expected 70% response rate to the questionnaire, a total of 480 questionnaires will be delivered.
 
-http://www-users.york.ac.uk/~mb55/guide/size.htm#est
+<http://www-users.york.ac.uk/~mb55/guide/size.htm#est>
 
 ## Another example
 - A sample size of 292 babies (146 in each of the treatment and placebo groups) will be sufficient to detect a difference of 16% between groups in the sepsis rate at 14 days, with 80% power and a 5% significance level. This 16% difference represents the difference between a 50% sepsis rate in the placebo group and a 34% rate in the treatment group.
 
 http://www-users.york.ac.uk/~mb55/guide/size.htm#est
+
+## Presenting/ Reviewing sample size calculation
+
+- Enough information to independently verify the calculation?
+- Background values justified/ referenced?
+- Effect size 'clinically' relevant?
+- Effect size realistic?
 
 ## Other useful sources
 - CONSORT and other guidelines
@@ -269,4 +286,4 @@ http://www-users.york.ac.uk/~mb55/guide/size.htm#est
 - Clinical trial protocols  
 
 
-https://pathmes.github.io/Sample-Size-Home/
+<https://pathmes.github.io/Sample-Size-Home/>
