@@ -15,7 +15,7 @@ format:
 2. Confidence intervals & P values  
 3. Type I error (level of significance)  
 4. Type II error (power)
-5. Impotance of calculating sample size
+5. Importance of calculating sample size
 6. Calculating sample size for  
    - Descriptive studies  
    - Cross sectional analytical studies 
@@ -257,6 +257,7 @@ print(paste0("If the prevalence is ", round(a$estimate*100,1), "%", ", the 95% C
 
 Information needed - % with recurrence  following Orchidectomy in 18 months & improvement expected by adding Drug A  
 
+
 ## Other issues
 - Design effect  
 - Unequal size groups
@@ -275,10 +276,29 @@ http://www-users.york.ac.uk/~mb55/guide/size.htm#est
 
 ## Presenting/ Reviewing sample size calculation
 
-- Enough information to independently verify the calculation?
-- Background values justified/ referenced?
-- Effect size 'clinically' relevant?
-- Effect size realistic?
+- Is the information enough to independently verify the calculation?
+- Are the background values justified/ referenced?
+- Is the effect size 'clinically' relevant?
+- Is the effect size realistic?
+
+## Common mistakes
+
+- Hiding behind formula - sometimes incorrect formula!
+- Not providing enough information to repeat the calculation
+- Not providing adequate justification/ references for the numbers used
+
+## Recap {.smaller}
+
+1. Properties of samples  
+2. Confidence intervals & P values  
+3. Type I error (level of significance)  
+4. Type II error (power)
+5. Importance of calculating sample size
+6. Calculating sample size for  
+   - Descriptive studies  
+   - Cross sectional analytical studies 
+   - Case control studies, Cohort studies & Clinical trials  
+7. Presenting sample size calculation
 
 ## Other useful resources
 - CONSORT and other guidelines

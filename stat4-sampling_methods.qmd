@@ -1,10 +1,10 @@
 ---
 title: "Sampling Methods"
-author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2023-02-15"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2024-02-08"
 format: 
   revealjs:
    theme: [default, custom.scss]
-   footer: "MD Community Medicine 2023"
+   footer: "MD Community Medicine 2024"
    embed-resources: true
    standalone: true
 ---
