@@ -1,10 +1,10 @@
 ---
 title: "Sample Size Calculation"
-author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2023-02-13"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2024-02-07"
 format: 
   revealjs:
    theme: [default, custom.scss]
-   footer: "MD Community Medicine 2023"
+   footer: "MD Community Medicine 2024"
    embed-resources: true
    standalone: true
 ---
@@ -280,10 +280,9 @@ http://www-users.york.ac.uk/~mb55/guide/size.htm#est
 - Effect size 'clinically' relevant?
 - Effect size realistic?
 
-## Other useful sources
+## Other useful resources
 - CONSORT and other guidelines
 - Protocol papers
 - Clinical trial protocols  
-
-
-<https://pathmes.github.io/Sample-Size-Home/>
+- Online calculator for a few common situations - [Online calculator](https://pathmes.github.io/Sample-Size-Home/)  
+- Introduction to sample size calculation - [My sample size website](https://pathmes.quarto.pub/sample-size-calculation/)
