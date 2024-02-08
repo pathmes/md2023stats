@@ -1,0 +1,109 @@
+---
+title: "ANOVA-1"
+format: pdf
+editor: visual
+---
+
+## Load Packages
+
+```{r}
+#| message: false
+#| 
+library(tidyverse)
+library(readr)
+library(broom)
+```
+
+## Get data
+
+```{r}
+#| message: false
+t100 <- read_csv("t100.csv")
+```
+
+## View data
+
+```{r}
+#| eval: false
+head(t100, 10)
+tail(t100, 5)
+names(t100)
+str(t100)
+```
+
+## Summarize
+
+```{r}
+#| eval: false
+
+t100 %>% 
+  summarise(Mean = mean(tealeave_m), SD = sd(tealeave_m), N = n())
+
+t100 %>% 
+  group_by(division) %>% 
+  summarise(Mean = mean(tealeave_m), SD = sd(tealeave_m), N = n())
+```
+
+#### Try summarising other variables, find other summary statistics and group by other variables
+
+## Graphs
+
+```{r}
+#| eval: false
+
+ggplot(data = t100, aes(x = factor(division), y =tealeave_m)) +
+  geom_boxplot()
+```
+
+```{r}
+#| eval: false
+
+ggplot(data = t100, aes(x = factor(division), y =tealeave_m)) +
+  geom_boxplot() + 
+  geom_dotplot(binaxis = "y", stackdir = "center") 
+```
+
+#### Try changing the order of the two geoms
+
+```{r}
+#| eval: false
+
+ggplot(data = t100, aes(x = factor(division), y =tealeave_m)) +
+  geom_boxplot() + 
+  geom_dotplot(binaxis = "y", stackdir = "center") + 
+  xlab("Division") + ylab("Tea Leaves Plucked During a Month in kg") +
+  theme(axis.text=element_text(size=16),
+        axis.title=element_text(size=16))
+```
+
+## Pairwise ttests
+
+```{r}
+#| eval: false
+
+pairwise.t.test(t100$tealeave_m, t100$division, p.adjust = "none")
+```
+
+```{r}
+#| eval: false
+
+pairwise.t.test(t100$tealeave_m, t100$division, p.adjust = "none") %>% 
+  tidy()
+```
+
+```{r}
+#| eval: false
+
+pairwise.t.test(t100$tealeave_m, t100$division, p.adjust = "bonferroni")
+```
+
+## Anova
+
+```{r}
+#| eval: false
+
+a1 <- aov(tealeave_m ~ division, t100)
+summary.aov(a1)
+tidy(anova(a1)) %>% 
+  add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq)) )
+```
