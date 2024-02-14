@@ -1,10 +1,10 @@
 ---
-title: "ANOVA 3 & 4"
-author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2023-02-16"
+title: "ANOVA 1 & 2"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2024-02-09"
 format: 
   revealjs:
    theme: [default, custom.scss]
-   footer: "MD Community Medicine 2023"
+   footer: "MD Community Medicine 2024"
    embed-resources: true
    standalone: true
 ---
@@ -87,6 +87,22 @@ ggplot(data = t100, aes(x = factor(division), y =tealeave_m)) +
   xlab("Division") + ylab("Tea Leaves Plucked During a Month in kg") +
   theme(axis.text=element_text(size=16),
         axis.title=element_text(size=16))
+```
+
+## Productivity by division2
+
+```{r}
+#| label: plot_div2o
+#| message: false
+
+ 
+ggplot(data = t100, aes(x = factor(division), y =tealeave_m)) +
+  geom_dotplot(binaxis = "y", stackdir = "center", fill = "grey") + 
+  xlab("Division") + ylab("Tea Leaves Plucked During a Month in kg") +
+  theme(axis.text=element_text(size=16),
+        axis.title=element_text(size=16))+ 
+  stat_summary(fun.y=mean, geom = "point", shape = 3, size = 15, lwd = 20, color = "brown") +
+  geom_hline(yintercept = mean(t100$tealeave_m, na.rm = TRUE))
 ```
 
 ## Productivity by Division
@@ -175,9 +191,26 @@ tidy(ptt) %>%
 :::
 :::
 
+
+## Productivity by division2
+
+```{r}
+#| label: plot_div2
+#| message: false
+
+ 
+ggplot(data = t100, aes(x = factor(division), y =tealeave_m)) +
+  geom_dotplot(binaxis = "y", stackdir = "center", fill = "grey") + 
+  xlab("Division") + ylab("Tea Leaves Plucked During a Month in kg") +
+  theme(axis.text=element_text(size=16),
+        axis.title=element_text(size=16))+ 
+  stat_summary(fun.y=mean, geom = "point", shape = 3, size = 15, lwd = 20, color = "brown") +
+  geom_hline(yintercept = mean(t100$tealeave_m, na.rm = TRUE))
+```
+
 ## Sum of squares
 
-Sum of squared deviations or sum of squares about the mean $\Sigma(x_i - \bar x)$\
+Sum of squared deviations or sum of squares about the mean $\Sigma(x_i - \bar x)^2$\
   Calculation of the variance and standard deviation is based on this.
 
 ## ANOVA Calculation
@@ -216,6 +249,14 @@ a1 <- aov(tealeave_m ~ division, t100)
 tidy(anova(a1)) %>% 
   add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq)) ) %>% knitr::kable(digits = c(0, 0, 0, 1, 2, 3))
 ```
+
+## Fisher's Least Significant Difference
+
+$LSD_{A,B} = t_{0.025,df} \sqrt {MS_W (1/n_A + 1/n_B)}$  
+
+$2.277 * \sqrt {8760 (1/25 + 1/25)}$  
+ 
+$= 60.3$
 
 ## Productivity by Age
 
