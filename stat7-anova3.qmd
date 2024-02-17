@@ -3,6 +3,7 @@ title: "ANOVA 5 & 6"
 author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2024-02-16"
 format: 
   revealjs:
+   margin: 0.1
    theme: [default, custom.scss]
    footer: "MD Community Medicine 2024"
    embed-resources: true
@@ -199,7 +200,7 @@ Coefficient of determination - $R^2$ $$R^2 = 1 - \frac{Res\ SSq}{Total\ SSq}$$\
 plot(r_anco, 1)
 ```
 
-## Bartlett test
+## Bartlett test{.smaller}
 
 ```{r}
 a <- as.data.frame(cbind(r_anco$residuals, r_anco$xlevels$Group))
@@ -255,7 +256,7 @@ For clinical trials comparing several treatments.\
 
 \  
 
-`Trial comparing low-dose adrenaline, promethazine, and hydrocortisone in the prevention of acute adverse reactions to antivenom following snakebite`
+#### Trial comparing low-dose adrenaline, promethazine, and hydrocortisone in the prevention of acute adverse reactions to antivenom following snakebite
 
 ## Latin square design
 
@@ -279,6 +280,7 @@ How many different ways are possible?
 
 ## Example 5x5x5 Latin square
 
+
 ```{r}
 fertil <- c(rep("fertil1",1), rep("fertil2",1), rep("fertil3",1), rep("fertil4",1), rep("fertil5",1))
 till <- c(rep("treatA",5), rep("treatB",5), rep("treatC",5), rep("treatD",5), rep("treatE",5))
@@ -289,6 +291,7 @@ df1 <- as_tibble(data.frame(till, fertil, seed, yield))
 
 df1
 ```
+
 
 ## Yield by fertilizer
 
@@ -356,6 +359,7 @@ plot_grid(f, t, s, nrow = 1)
 
 ## 3 way Anova
 
+
 ```{r}
 a1 <- aov(yield ~ fertil + till + seed, data = df1)
 
@@ -363,3 +367,5 @@ tidy(anova(a1)) %>%
   add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq))) %>% 
   knitr::kable(digits = c(0, 0, 1, 1, 2, 4))
 ```
+
+
