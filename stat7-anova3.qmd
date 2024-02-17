@@ -1,10 +1,10 @@
 ---
 title: "ANOVA 5 & 6"
-author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2023-02-23"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2024-02-16"
 format: 
   revealjs:
    theme: [default, custom.scss]
-   footer: "MD Community Medicine 2023"
+   footer: "MD Community Medicine 2024"
    embed-resources: true
    standalone: true
 ---
@@ -19,7 +19,7 @@ format:
 -   Randomised block design
 -   Balanced incomplete block design,
 -   **Latin square design**,
--   Repeated measure ANOVA, MANOVA, ***ANCOVA**
+-   Repeated measure ANOVA, MANOVA, \***ANCOVA**
 
 ```{r}
 #|label: load_packages
@@ -34,7 +34,8 @@ suppressMessages(library(car))
 suppressMessages(library(MASS))
 suppressMessages(library(tibble))
 suppressMessages(library(patchwork))
-
+suppressMessages(library(cowplot))
+suppressMessages(library(gt))
 ```
 
 ## ANCOVA Analysis of Covariance
@@ -60,7 +61,9 @@ dfw <- readRDS(here::here("data", "dfw.rds"))
 dfw %>% dplyr::select(Group, Pre, Post) %>% 
   tbl_summary(by = Group,
               statistic = all_continuous() ~ "{mean} ({sd})", 
-              digits = list(c(Pre, Post)~c(1, 1)))
+              digits = list(c(Pre, Post)~c(1, 1))) %>%
+  as_gt() %>%
+  tab_options(table.font.size = 36)
 
 ```
 
@@ -91,7 +94,7 @@ p11
 
 -   The baseline (Pre) scores appear to be similar in the two groups\
 -   Therefore, we can just compare the followup scores\
--   Based on the descriptive statistics and the boxplot we could argue that there is no need for a formal hypothesis test\
+-   Based on the descriptive statistics and the box plots we could argue that there is no need for a formal hypothesis test\
 -   We'll just try the t test
 
 ## Comparison of followup scores using the t test
@@ -131,7 +134,9 @@ dfw$Fall <- dfw$Pre - dfw$Post
 dfw %>% dplyr::select(Group, Fall) %>% 
   tbl_summary(by = Group,
               statistic = all_continuous() ~ "{mean} ({sd})",
-              digits = list(Fall ~ c(1, 1)))
+              digits = list(Fall ~ c(1, 1))) %>%
+  as_gt() %>%
+  tab_options(table.font.size = 36)
 ```
 
 ## Comparison of fall in score using the t test
@@ -194,6 +199,24 @@ Coefficient of determination - $R^2$ $$R^2 = 1 - \frac{Res\ SSq}{Total\ SSq}$$\
 plot(r_anco, 1)
 ```
 
+## Bartlett test
+
+```{r}
+a <- as.data.frame(cbind(r_anco$residuals, r_anco$xlevels$Group))
+a$V1 <- as.numeric(a$V1)
+
+
+bartlett.test(V1 ~ V2, data = a)
+
+```
+
+## Levene test
+
+```{r}
+leveneTest(V1 ~ V2, data = a)
+
+```
+
 ## Plot to assess Normality
 
 ```{r}
@@ -225,6 +248,14 @@ p1 +
 -   When the correlation between baseline & followup is low (r \< 0.3) comparison of followup score is more powerful than change score provided there is no baseline imbalance
 -   The method of analysis should be specified in the protocol. Trying all three to find a significant results is wrong.
 -   In general for this type of data ANCOVA is the method of choice
+
+## Factorial design
+
+For clinical trials comparing several treatments.\  
+
+\  
+
+`Trial comparing low-dose adrenaline, promethazine, and hydrocortisone in the prevention of acute adverse reactions to antivenom following snakebite`
 
 ## Latin square design
 
@@ -259,31 +290,68 @@ df1 <- as_tibble(data.frame(till, fertil, seed, yield))
 df1
 ```
 
-## Yeild by fertiliser
+## Yield by fertilizer
+
 ```{r}
 df1 %>% 
   dplyr::select(fertil, yield) %>% 
   tbl_summary(by = fertil,
               statistic = all_continuous() ~ "{mean} ({sd})",
-              digits = list(yield ~ c(1, 1)))
+              digits = list(yield ~ c(1, 1))) %>%
+  as_gt() %>%
+  tab_options(table.font.size = 36)
 ```
 
-## Yeild by tillage
+## Yield by tillage
+
 ```{r}
 df1 %>% 
   dplyr::select(till, yield) %>% 
   tbl_summary(by = till,
               statistic = all_continuous() ~ "{mean} ({sd})",
-              digits = list(yield ~ c(1, 1)))
+              digits = list(yield ~ c(1, 1))) %>%
+  as_gt() %>%
+  tab_options(table.font.size = 36)
 ```
 
-## Yeild by seed
+## Yield by seed
+
 ```{r}
 df1 %>% 
   dplyr::select(seed, yield) %>% 
   tbl_summary(by = seed,
               statistic = all_continuous() ~ "{mean} ({sd})",
-              digits = list(yield ~ c(1, 1)))
+              digits = list(yield ~ c(1, 1))) %>%
+  as_gt() %>%
+  tab_options(table.font.size = 36)
+```
+
+## Plot
+
+```{r}
+
+
+#| message: false
+f <- ggplot(data = df1, aes(x = factor(fertil), y =yield)) +
+  geom_dotplot(binaxis = "y", stackdir = "center") + 
+  xlab("") + ylab("") +
+  theme(axis.text=element_text(size=10),
+        axis.title=element_text(size=10))
+
+t <- ggplot(data = df1, aes(x = factor(till), y =yield)) +
+  geom_dotplot(binaxis = "y", stackdir = "center") + 
+  xlab("") + ylab("") +
+  theme(axis.text=element_text(size=10),
+        axis.title=element_text(size=10))
+
+s <- ggplot(data = df1, aes(x = factor(seed), y =yield)) +
+  geom_dotplot(binaxis = "y", stackdir = "center") + 
+  xlab("") + ylab("") +
+  theme(axis.text=element_text(size=10),
+        axis.title=element_text(size=10))
+
+plot_grid(f, t, s, nrow = 1)
+
 ```
 
 ## 3 way Anova
@@ -295,4 +363,3 @@ tidy(anova(a1)) %>%
   add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq))) %>% 
   knitr::kable(digits = c(0, 0, 1, 1, 2, 4))
 ```
-
