@@ -1,10 +1,11 @@
 ---
 title: "Sample Size Calculation"
-author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2024-02-07"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2025-02-07"
 format: 
   revealjs:
-   theme: [default, custom.scss]
-   footer: "MD Community Medicine 2024"
+   theme: [default, pgim2025.scss]
+   footer: "MD Community Medicine 2025"
+   slide-number: c/t
    embed-resources: true
    standalone: true
 ---
@@ -202,7 +203,7 @@ What if you can afford only a particular sample size?
 
 Can we go ahead and do a prevalence study if the maximum possible sample size is 200?
 
-## What if you can afford only 200 participants? 
+## What if you can afford only 200 participants? {.smaller}
 ```{r}
 a <- binom.test(10, 200)
 print(paste0("If the prevalence is ", round(a$estimate*100,1), "%", ", the 95% CI will be from ", round(a$conf.int[1]*100, 1), " to ", round(a$conf.int[2]*100, 1)))  
@@ -221,6 +222,9 @@ print(paste0("If the prevalence is ", round(a$estimate*100,1), "%", ", the 95% C
 - Clinical trial
 - All these can be expressed as difference between two proportions
 - Cross sectional study & Clinical trial can be difference between means.  
+
+---
+![](Designs2019.png)
 
 ## Analytical study
 - Level of significance (usually 0.05)
