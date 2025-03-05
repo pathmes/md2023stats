@@ -1,0 +1,339 @@
+---
+title: "ANOVA I & II"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2025-02-11"
+format: 
+  revealjs:
+   theme: [default, pgim2025.scss]
+   footer: "MD Community Medicine 2025"
+   slide-number: c/t
+   embed-resources: true
+   standalone: true
+---
+
+```{r}
+#| label: packages 
+#| echo: false
+#| message: false
+#| warning: false
+suppressMessages(library(tidyverse))
+suppressMessages(library(gtsummary))
+suppressMessages(library(broom))
+```
+
+```{r}
+#| label: get_data
+#| echo: false
+load(here::here("data", "tea.rda"))
+tea$tealeave_m <- round(tea$tealeave*tea$dayswork)
+
+set.seed(123456)
+t100 <- tea %>%
+  filter(tealeave_m>100) %>%
+  filter(tealeave_m<500) %>%
+  group_by(division) %>%
+  slice_sample(n = 25) %>%
+  filter(division != "N") 
+t100 <- t100 %>% 
+  mutate(hb_gp=cut(newhb, breaks=c(0, 9.99, 11, 20), labels=c("U_10","10-11","O_11")))
+t100 <- t100 %>% 
+  mutate(age_gp=cut(age, breaks=c(0, 34, 44,  69), labels=c("U_35","35-44","44-59")))
+
+
+
+
+```
+
+## Syllabus
+
+One way ANOVA:
+
+a.  applications
+b.  calculations
+c.  interpretation of ANOVA table
+d.  application & interpretation of post-hoc tests
+e.  Bonferroni adjustment
+
+## Analysis of Variance - ANOVA
+
+-   A technique for comparison of means of multiple groups
+    -   A special case of this (means of two groups) is the t test
+    -   Why call it analysis of variance if it is used for the comparison of means
+-   Why not use multiple t tests?
+
+## Probability App by Matt Bognar
+
+::::: columns
+::: {.column width="50%"}
+![](appstore.png)\
+iOS
+:::
+
+::: {.column width="50%"}
+![](playstore.png)\
+Android
+:::
+:::::
+
+## Data (Number of records = `r nrow(t100)`)
+
+```{r}
+#| Label: sample_data
+t100 %>% dplyr::select(tealeave_m, division, age_gp, hb_gp) %>% head(7) %>% knitr::kable()
+
+```
+
+## Data Summary 1 
+
+```{r}
+#| label: d_summary1
+#| message: false
+t100 %>% dplyr::select(tealeave_m, division) %>%
+  tbl_summary(statistic = all_continuous() ~ "{mean} ({sd})")
+```
+
+## Data Summary 2
+
+```{r}
+#| label: d_summary2
+#| message: false
+t100 %>% dplyr::select(age_gp, hb_gp) %>%
+  tbl_summary(statistic = all_continuous() ~ "{mean} ({sd})")
+```
+
+
+## Productivity by division
+
+```{r}
+#| label: plot_div
+#| message: false
+ggplot(data = t100, aes(x = factor(division), y =tealeave_m)) +
+  geom_boxplot() + 
+  geom_dotplot(binaxis = "y", stackdir = "center") + 
+  xlab("Division") + ylab("Tea Leaves Plucked During a Month in kg") +
+  theme(axis.text=element_text(size=16),
+        axis.title=element_text(size=16))
+```
+
+## Productivity by Division
+
+```{r}
+
+
+t100 %>% group_by(division) %>% 
+  summarise(Mean = mean(tealeave_m), SD = sd(tealeave_m), N = n()) %>% 
+  knitr::kable(digits = c(0, 1, 1, 0))
+
+```
+
+## Pairwise t tests
+
+```{r}
+ptt <- pairwise.t.test(t100$tealeave_m, t100$division, p.adjust = "none")
+tidy(ptt) %>% knitr::kable(digits = c(0, 0, 3))
+```
+
+## Adjusting p value for multiple comparison - Bonferroni{.smaller}
+
+Probability of Type 1 error for a single test is 0.05\
+
+ . . .   
+ 
+Probability of Type 1 error for two tests is $1 - 0.95^2 = 0.1$
+
+For *n* tests
+
+$$ 1- 0.95^2 \approx 0.05 \times 2$$ $$ 1- 0.95^n \approx 0.05 \times n$$
+
+A p value from multiple (n) comparisons should be $\frac{0.05}{n}$ to be significant at 0.05
+
+  Correcting a p value for multiple (n) comparisons - p value $\times n$
+
+## Pairwise t test (Bonferroni)
+
+::: columns
+::: {.column width="50%"}
+```{r}
+ptt <- pairwise.t.test(t100$tealeave_m, t100$division, p.adjust = "none")
+tidy(ptt) %>% 
+  knitr::kable(digits = c(0, 0, 3))
+  
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+ptt <- pairwise.t.test(t100$tealeave_m, t100$division, p.adjust = "bonferroni")
+tidy(ptt) %>% 
+  knitr::kable(digits = c(0, 0, 3))
+```
+:::
+:::
+
+## Adjusting p value for multiple comparison - Holm
+
+-   Bonferroni method
+
+    -   Correcting for multiple (n) comparisons - p value $\times n$\
+
+-   Holm method
+
+    -   Arrange the (n) p values in ascending order\
+    -   Smallest p value \< $\frac{0.05}{n}$ *Significant*\
+    -   Next p value \< $\frac{0.05}{n-1}$ *Significant*\
+    -   Continue till a not significant results
+
+## Pairwise t test (Holm's adjustment)
+
+::: columns
+::: {.column width="50%"}
+```{r}
+ptt <- pairwise.t.test(t100$tealeave_m, t100$division, p.adjust = "none")
+tidy(ptt) %>% 
+  knitr::kable(digits = c(0, 0, 3))
+  
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+ptt <- pairwise.t.test(t100$tealeave_m, t100$division, p.adjust = "holm")
+tidy(ptt) %>% 
+  knitr::kable(digits = c(0, 0, 3))
+```
+:::
+:::
+
+## Sum of squares
+
+Sum of squared deviations or sum of squares about the mean $\Sigma(x_i - \bar x)$\
+  Calculation of the variance and standard deviation is based on this.
+
+## ANOVA Calculation
+
+-   Based on
+    -   Comparison of between group variation with within group variation
+-   Sum of squares (SSq)
+    -   Total SSq = Between group SSq + Within group (Residual) SSq
+
+$$ F\; statistic =   \frac{Between\; group\; MSq}{Residual\; MSq}$$
+
+## Calculate ANOVA
+
+::: columns
+::: {.column width="60%"}
+```{r}
+t100 %>% group_by(division) %>% 
+  summarise(Mean = mean(tealeave_m), SD = sd(tealeave_m), N = n()) %>% 
+  knitr::kable(digits = c(0, 1, 1, 0))
+```
+:::
+
+::: {.column width="40%"}
+```{r}
+t100 %>% ungroup() %>% 
+  summarise(Mean = mean(tealeave_m), SD = sd(tealeave_m), N = n()) %>% 
+  knitr::kable(digits = c(1, 1, 0))
+```
+:::
+:::
+
+## ANOVA
+
+```{r}
+a1 <- aov(tealeave_m ~ division, t100)
+tidy(anova(a1)) %>% 
+  add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq)) ) %>% knitr::kable(digits = c(0, 0, 0, 1, 2, 3))
+```
+
+## Productivity by Age
+
+```{r}
+ggplot(t100)+
+  aes(factor(age_gp), tealeave_m) +
+  geom_boxplot() + 
+  geom_dotplot(binaxis = "y", stackdir = "center") + 
+  xlab("Age group") + ylab("Tea Leaves Plucked During a Month in kg") +
+  theme(axis.text=element_text(size=16),
+        axis.title=element_text(size=16))
+```
+
+## Pairwise t test (Age group)
+
+::: columns
+::: {.column width="50%"}
+
+```{r}
+
+t100 %>% group_by(age_gp) %>% 
+  summarise(Mean = mean(tealeave_m), SD = sd(tealeave_m), N = n()) %>% 
+  knitr::kable(digits = c(0, 1, 1, 0))
+```
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+ptt <- pairwise.t.test(t100$tealeave_m, t100$age_gp, p.adjust = "none")
+tidy(ptt) %>% 
+  knitr::kable(digits = c(0, 0, 3))
+```
+
+:::
+:::
+
+## ANOVA -Productivity by Age
+
+```{r}
+a2 <- aov(tealeave_m ~ age_gp, t100)
+tidy(anova(a2)) %>% 
+  add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq)) ) %>% 
+  knitr::kable(digits = c(0, 0, 0, 1, 2, 3))
+```
+
+## Productivity by Hb
+
+```{r}
+ggplot(t100)+
+  aes(factor(hb_gp), tealeave_m) +
+  geom_boxplot() + 
+  geom_dotplot(binaxis = "y", stackdir = "center") + 
+  xlab("Hb group") + ylab("Tea Leaves Plucked During a Month in kg") +
+  theme(axis.text=element_text(size=18),
+        axis.title=element_text(size=18))
+```
+
+## Pairwise t test (Hb group)
+
+::: columns
+::: {.column width="50%"}
+
+```{r}
+
+t100 %>% group_by(hb_gp) %>% 
+  summarise(Mean = mean(tealeave_m), SD = sd(tealeave_m), N = n()) %>% 
+  knitr::kable(digits = c(0, 1, 1, 0))
+```
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+
+ptt <- pairwise.t.test(t100$tealeave_m, t100$hb_gp, p.adjust = "none")
+tidy(ptt) %>% 
+   knitr::kable(digits = c(0, 0, 3))
+```
+
+:::
+:::
+
+## ANOVA -Productivity by Hb
+
+```{r}
+a3 <- aov(tealeave_m ~ hb_gp, t100)
+tidy(anova(a3)) %>% 
+  add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq)) ) %>% 
+  knitr::kable(digits = c(0, 0, 1, 1, 1, 3))
+```

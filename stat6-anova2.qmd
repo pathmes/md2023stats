@@ -1,0 +1,456 @@
+---
+title: "ANOVA 3 & 4"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2025-02-13"
+format: 
+  revealjs:
+   theme: [default, pgim2025.scss]
+   footer: "MD Community Medicine 2025"
+   slide-number: c/t
+   embed-resources: true
+   standalone: true
+---
+
+## Syllabus
+
+* Factorial ANOVA
+    + Main effects & interaction
+    + Calculation
+    + Interpretation of two way ANOVA table
+    
+* Completely randomized design
+* Randomised block design
+* Balance incomplete block design,
+* Latin square design,
+* Repeated measure ANOVA, MANOVA, ANCOVA
+
+
+
+```{r}
+#|label: load_packages
+#|echo: false
+#|message: false
+#|warning: false
+
+suppressMessages(library(tidyverse))
+suppressMessages(library(gtsummary))
+suppressMessages(library(broom))
+suppressMessages(library(car))
+suppressMessages(library(MASS))
+suppressMessages(library(tibble))
+suppressMessages(library(pixiedust))
+```
+## Tooth Growth Data
+
+A data set with 60 observations on 3 variables (sample data in R)  
+
+**len**		Tooth length  
+**supp**	Supplement type (VC or OJ)  
+**dose**	Dose in milligrams/day  
+
+
+## Explore the data
+```{r}
+#| message: false
+df2 <- as_tibble(ToothGrowth)
+df2$dose <- factor(df2$dose,
+                   levels = c(0.5, 1, 2),
+                   labels = c("D0.5", "D1.0", "D2.0"))
+
+set.seed(1234)
+df2 %>% 
+  sample_n(10) %>% 
+  knitr::kable()
+```
+
+## Data Summary
+
+```{r}
+#| message: false
+
+
+df2 %>% 
+  tbl_summary(statistic = all_continuous() ~ "{mean} ({sd})",
+                    digits = list(len ~ c(1, 2))) 
+```
+
+
+
+## Cross tabulation of supp and dose.
+```{r message=FALSE}
+tbl_cross(
+  df2,
+  row = dose,
+  col = supp,
+  margin = c("column", "row"),
+  margin_text = "Total"
+)
+```
+  
+  
+## Summarize length by supp  
+
+```{r message=FALSE}
+df2 %>% 
+  group_by(supp) %>% 
+  summarise(
+    count = n(),
+    Mean = mean(len),
+    SD = sd(len)
+  ) %>% 
+  knitr::kable(digits = c(0, 0, 1, 1))
+```
+
+## Summarize length by dose
+
+```{r}
+df2 %>% 
+  group_by(dose) %>%
+  summarise(    count = n(),
+                Mean = mean(len),
+                SD = sd(len)
+  ) %>% 
+  knitr::kable(digits = c(0, 0, 1, 1))
+```
+
+
+## Summarize length by supp and dose
+
+```{r}
+#| warning: false
+#| message: false
+df2 %>% 
+  group_by(supp, dose) %>%
+  summarise(    count = n(),
+                Mean = mean(len),
+                SD = sd(len)
+  ) %>% 
+  knitr::kable(digits = c(0, 0, 0, 1, 1))
+```
+
+## Boxplots
+
+::::: columns
+::: {.column width="50%"}
+```{r}
+ggplot(data = df2, mapping = aes(x = supp, y = len, fill = dose)) + 
+  geom_boxplot() 
+
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+ggplot(data = df2, mapping = aes(x = dose, y = len, fill = supp)) + 
+  geom_boxplot() 
+
+```
+:::
+:::::
+
+
+
+
+## Boxplot
+```{r}
+ggplot(data = df2, mapping = aes(x = dose, y = len, fill = supp)) + 
+  geom_boxplot() 
+
+```
+
+## Two way ANOVA - No Interaction
+
+
+```{r}
+#| message: false
+r_aov2 <- aov(len ~ supp + dose, data = df2)
+tidy(anova(r_aov2)) %>% 
+  add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq)) ) %>% 
+  dust() |> 
+  sprinkle(cols = 3:4, round = 1) |> 
+  sprinkle(cols = 5, round = 2) |> 
+  sprinkle(cols = 6, fn = quote(pval_string(value))) |>
+  sprinkle_colnames(term = "Term",
+                    df = "DF",
+                    sumsq = "SSq",
+                    meansq = "MSq",
+                    statistic = "VR",
+                    p.value = "P-value") |> 
+ knitr::kable()
+```
+
+
+This is the results of an additive model.  The effect of the two factors on tooth growth is independent of each other.    
+We could check and see if there is an interaction between the two factors - the effect of one factor is altered by the level of the other factor.   
+
+
+## Model Summary  
+
+```{r}
+model.tables(r_aov2, type = "means", se = TRUE)
+
+```
+
+## Post hoc comparisons  
+
+```{r}
+hsd1 <- TukeyHSD(r_aov2) 
+hsd1
+```
+## Adjusted 95% CI of differences
+
+```{r}
+x <- as.tibble(
+  as.data.frame(hsd1$dose, 
+                row.names = names(hsd1$dose[,1])), rownames = NA)
+x <- rownames_to_column(x, "Groups")
+knitr::kable(x, digits = c(0, 2, 2, 2))
+```
+
+
+
+## Check homogeneity of Variance
+
+```{r}
+plot(r_aov2, 1)
+```
+
+## Check Normality
+
+```{r}
+plot(r_aov2, 2)
+
+```
+
+## Formal test for Normality
+
+This can be formally tested by using the Shapiro-Wilk test  
+
+```{r comment=""}
+r_aov2 %>%
+residuals() %>%
+shapiro.test()
+```
+
+## Two way ANOVA - With Interaction
+
+```{r message=FALSE}
+r_aov2i <- aov(len ~ supp * dose, data = df2)
+tidy(anova(r_aov2i)) %>% 
+  add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq)) ) %>% 
+    dust() |> 
+  sprinkle(cols = 3:4, round = 1) |> 
+  sprinkle(cols = 5, round = 2) |> 
+  sprinkle(cols = 6, fn = quote(pval_string(value))) |>
+  sprinkle_colnames(term = "Term",
+                    df = "DF",
+                    sumsq = "SSq",
+                    meansq = "MSq",
+                    statistic = "VR",
+                    p.value = "P-value") |> 
+  knitr::kable()
+  
+```
+ 
+## Model Summary   
+
+```{r}
+model.tables(r_aov2i, type = "means", se = TRUE)
+```
+
+
+## Post hoc comparisons  
+
+```{r}
+TukeyHSD(r_aov2i)
+```
+
+## Check homogeneity of Variance
+
+```{r}
+plot(r_aov2i, 1)
+```
+
+## Check Normality
+
+```{r}
+plot(r_aov2i, 2)
+
+```
+
+## Formal test for Normality
+
+
+```{r}
+r_aov2i %>%
+residuals() %>%
+shapiro.test()
+```
+
+## ANCOVA
+
+Pre and Post treatment weight of patients with anorexia.  The treatment groups were Cont = Control, CBT = Cognitive Behavior Therapy & FT = Family Therapy (Source: the data set is in the MASS package)
+
+
+## Sample data
+```{r message=FALSE}
+df1 <- anorexia
+df1$Treat <- factor(df1$Treat, levels = c("Cont", "CBT", "FT"))
+set.seed(1234)
+sample_n(df1, 10) %>% 
+  knitr::kable()
+```
+
+## Data Summary
+
+```{r}
+#| message: false
+df1 %>% tbl_summary(statistic = all_continuous() ~ "{mean} ({sd})",
+                    digits = list(c(Prewt, Postwt) ~ c(1, 2)))
+```
+
+
+## Data Summary
+
+```{r}
+#| message: false
+df1 %>% tbl_summary(by = Treat,
+                    statistic = all_continuous() ~ "{mean} ({sd})",
+                    digits = list(c(Prewt, Postwt) ~ c(1, 2)))
+```
+
+
+## Visualize - scatterplot
+
+```{r}
+ggplot(data = df1, mapping = aes(x = Prewt, y = Postwt)) + 
+  geom_point(size = 3, alpha = 0.67) 
+
+```
+
+## Visualize - scatterplot by treatment
+
+```{r}
+
+ggplot(data = df1, mapping = aes(x = Prewt, y = Postwt, color = Treat)) + 
+  geom_point(size = 3, alpha = 0.67) 
+
+```
+
+## ANCOVA without interaction (main effects only)
+```{r message=FALSE}
+r_aov3 <- aov(Postwt ~ Treat + Prewt, data = df1)
+tidy(anova(r_aov3)) %>% 
+  add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq)) ) %>% 
+    dust() |> 
+  sprinkle(cols = 3:4, round = 1) |> 
+  sprinkle(cols = 5, round = 2) |> 
+  sprinkle(cols = 6, fn = quote(pval_string(value))) |>
+  sprinkle_colnames(term = "Term",
+                    df = "DF",
+                    sumsq = "SSq",
+                    meansq = "MSq",
+                    statistic = "VR",
+                    p.value = "P-value") |> 
+  knitr::kable()
+```
+
+## Post hoc comparisons 
+```{r comment="", warning=FALSE}
+
+TukeyHSD(r_aov3, "Treat")
+```
+
+## Homogeneity of variance
+```{r}
+plot(r_aov3, 1)
+
+```
+
+## Normality plot of the residuals
+```{r}
+plot(r_aov3, 2)
+```
+
+## Shapiro-Wilk test
+```{r comment=""}
+r_aov3 %>%
+residuals() %>%
+shapiro.test()
+```
+
+## ANCOVA with interaction
+```{r message=FALSE}
+r_aov3i <- aov(Postwt ~ Treat * Prewt, data = df1)
+tidy(anova(r_aov3i)) %>% 
+  add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq)) ) %>% 
+    dust() |> 
+  sprinkle(cols = 3:4, round = 1) |> 
+  sprinkle(cols = 5, round = 2) |> 
+  sprinkle(cols = 6, fn = quote(pval_string(value))) |>
+  sprinkle_colnames(term = "Term",
+                    df = "DF",
+                    sumsq = "SSq",
+                    meansq = "MSq",
+                    statistic = "VR",
+                    p.value = "P-value") |> 
+    knitr::kable()
+```
+## Post hoc comparisons 
+```{r comment="", warning=FALSE}
+
+TukeyHSD(r_aov3i, "Treat")
+```
+
+
+## Homogeneity of Variance
+
+```{r}
+
+plot(r_aov3i, 1)
+```
+
+## Normality plot of the residuals
+```{r}
+plot(r_aov3i, 2)
+```
+
+## Shapiro-Wilk test
+```{r comment=""}
+r_aov3i %>%
+residuals() %>%
+shapiro.test()
+```
+
+## Plot of the raw data and fitted values
+
+```{r}
+#| message: false
+df1$fit3 <- fitted(r_aov3)
+
+
+ggplot(data = df1, aes(x = Prewt, y = Postwt, color = Treat) ) +
+geom_point(size = 3, alpha = 0.67) +
+geom_line(aes(y = fit3), size = 1)
+
+
+```
+
+
+## Plot of the raw data and fitted values
+
+```{r}
+#| message: false
+df1$fit3i <- fitted(r_aov3i)
+
+
+
+ggplot(data = df1, aes(x = Prewt, y = Postwt, color = Treat) ) +
+geom_point(size = 3, alpha = 0.67) +
+geom_line(aes(y = fit3i), size = 1)
+
+```
+
+## Two-way analysis of variance
+
+Textbook example
+

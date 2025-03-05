@@ -1,0 +1,49 @@
+---
+title: Quarto Clean Theme
+subtitle: A Minimalistic Theme for Quarto + Typst + Touying
+date: today
+date-format: long
+image: static/img/thumbnail.svg
+author:
+  - name: Kazuharu Yanagimoto
+    orcid: 0009-0007-1967-8304
+    email: kazuharu.yanagimoto@cemfi.edu.es
+    affiliations: CEMFI
+format:
+  clean-typst:
+    bibliographystyle: "chicago-author-date"
+    include-in-header: "custom.typ"
+    commands: [small-cite]
+execute: 
+  echo: false
+  warning: false
+brand:
+  typography: 
+    fonts: 
+      - family: Roboto
+        weight: [light, bold]
+        source: google
+---
+# Section Slide as Header Level 1
+
+## Slide Title as Header Level 2
+
+### Subtitle as Header Level 3
+
+You can put any content here, including text, images, tables, code blocks, etc.
+
+- first unorder list item
+    - A sub item
+
+1. first ordered list item
+    1. A sub item
+
+Next, we'll brief review some theme-specific components.
+
+- Note that _all_ of the standard Quarto + Typst
+[features](https://quarto.org/docs/output-formats/typst.html) 
+can be used with this theme
+- Also, all the [Touying](https://touying-typ.github.io) features can be used by **Typst native code**
+
+## Before You Go...
+---

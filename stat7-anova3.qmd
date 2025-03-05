@@ -1,0 +1,399 @@
+---
+title: "ANOVA 5 & 6"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2025-02-17"
+format: 
+  revealjs:
+   theme: [default, pgim2025.scss]
+   footer: "MD Community Medicine 2023"
+   slide-number: c/t
+   embed-resources: true
+   standalone: true
+---
+
+## Syllabus
+
+-   Factorial ANOVA
+    -   Main effects & interaction
+    -   Calculation
+    -   Interpretation of two way ANOVA table
+-   Completely randomized design
+-   Randomised block design
+-   Balanced incomplete block design,
+-   **Latin square design**,
+-   Repeated measure ANOVA, MANOVA, ***ANCOVA**
+
+```{r}
+#|label: load_packages
+#|echo: false
+#|message: false
+#|warning: false
+
+suppressMessages(library(tidyverse))
+suppressMessages(library(gtsummary))
+suppressMessages(library(broom))
+suppressMessages(library(car))
+suppressMessages(library(MASS))
+suppressMessages(library(tibble))
+suppressMessages(library(patchwork))
+suppressMessages(library(pixiedust))
+suppressMessages(library(gt))
+```
+
+## ANCOVA Analysis of Covariance
+
+-   Used in analysing data from baseline and followup measurements\
+-   Three alternative methods of analysis of such data in a clinical trial
+    -   Compare the groups using the final measurement as the dependent variable
+    -   Compare the groups using the change in values as the dependent variable
+    -   ANCOVA
+
+## Trial on Voice therapy for vocalfold nodules
+
+-   Outcome measure - voice quality assessed by a therapist on a scale from 0 to 120 - **Lower score better quality**
+-   Intervention group 32 participants
+-   Control group 32 participants
+
+## Summary of baseline & followup scores
+### Lower score better voice quality
+
+```{r}
+
+dfw <- readRDS(here::here("data", "dfw.rds"))
+
+dfw %>% dplyr::select(Group, Pre, Post) %>% 
+  tbl_summary(by = Group,
+              statistic = all_continuous() ~ "{mean} ({sd})", 
+              digits = list(c(Pre, Post)~c(1, 1)))
+
+```
+
+## Boxplot of baseline & followup scores
+
+```{r}
+p0 <- dfw %>% 
+  pivot_longer(!c(serialno,Group), names_to = "Timing", values_to = "score") %>% 
+  ggplot(aes(score, Timing, color = Group))
+p00 <- p0 + geom_boxplot() 
+
+p00
+
+```
+
+## Another Boxplot of baseline & followup scores
+
+```{r}
+p1 <- dfw %>% 
+  pivot_longer(!c(serialno,Group), names_to = "Timing", values_to = "score") %>% 
+  ggplot(aes(score, Group, color = Timing))
+p11 <- p1 + geom_boxplot() 
+p11
+
+```
+
+## Analysis - option 1
+
+-   The baseline (Pre) scores appear to be similar in the two groups\
+-   Therefore, we can just compare the followup scores\
+-   Based on the descriptive statistics and the boxplot we could argue that there is no need for a formal hypothesis test\
+-   We'll just try the t test
+
+## Comparison of followup scores using the t test
+
+```{r}
+#| comment: ""
+
+tt1 <- t.test(Post~Group, dfw)
+tt1y <- tidy(tt1)
+tt1f <- tt1y[,2:8]
+tt1f |> 
+    dust() |> 
+  sprinkle(cols = 1:3, round = 1) |> 
+  sprinkle(cols = 5:7, round = 1) |> 
+  sprinkle(cols = 4, fn = quote(pval_string(value))) |>
+  sprinkle_colnames(estimate1 = "Mean_C",
+                    estimate2 = "Mean_I",
+                    statistic = "t value",
+                    parameter = "DF") |> 
+ knitr::kable()
+```
+
+
+## Check the assumptions
+### Normality plot
+
+```{r}
+pst <- scale(dfw$Post)
+qqnorm(pst)
+qqline(pst)
+ 
+
+```
+
+
+## Check the assumptions
+### Normality test
+
+```{r}
+tidy(with(dfw, shapiro.test(Post)))  
+
+```
+
+## Check the assumptions
+
+-   Equal variances?\
+
+```{r}
+var.test(Post ~ Group, data = dfw)
+```
+
+## Analysis - option 2
+
+-   Calculate the reduction/ fall in the score from Pre to Post
+-   Compare the two Groups
+
+```{r}
+dfw$Fall <- dfw$Pre - dfw$Post
+
+dfw %>% dplyr::select(Group, Fall) %>% 
+  tbl_summary(by = Group,
+              statistic = all_continuous() ~ "{mean} ({sd})",
+              digits = list(Fall ~ c(1, 1))) |> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+```
+
+## Comparison of fall in score using the t test
+
+```{r}
+tt2 <- t.test(Fall~Group, dfw)
+tt2y <- tidy(tt2)
+tt2f <- tt2y[,2:8]
+tt2f |> 
+    dust() |> 
+  sprinkle(cols = 1:3, round = 1) |> 
+  sprinkle(cols = 5:7, round = 1) |> 
+  sprinkle(cols = 4, fn = quote(pval_string(value))) |>
+  sprinkle_colnames(estimate1 = "Mean_C",
+                    estimate2 = "Mean_I",
+                    statistic = "t value",
+                    parameter = "DF") |> 
+ knitr::kable()
+```
+
+
+## Check the assumptions
+### Normality plot
+
+```{r}
+fll <- scale(dfw$Fall)
+qqnorm(fll)
+qqline(fll)
+ 
+
+```
+
+
+## Check the assumptions
+### Normality test
+
+```{r}
+tidy(with(dfw, shapiro.test(Fall)))  
+
+```
+
+## Scatter plot
+
+```{r}
+p0 <- ggplot(data = dfw, aes(Pre, Post, colour = Group)) 
+p1 <- p0 + geom_point() + geom_abline(intercept = 0, slope = 1)
+p1
+
+
+```
+
+## ANCOVA
+
+```{r}
+r_anco <- aov(Post ~ Pre + Group, data = dfw)
+tidy(anova(r_anco)) %>% 
+  add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq))) %>% 
+    dust() |> 
+  sprinkle(cols = 3:4, round = 1) |> 
+  sprinkle(cols = 5, round = 2) |> 
+  sprinkle(cols = 6, fn = quote(pval_string(value))) |>
+  sprinkle_colnames(term = "Term",
+                    df = "DF",
+                    sumsq = "SSq",
+                    meansq = "MSq",
+                    statistic = "VR",
+                    p.value = "P-value") |> 
+  knitr::kable()
+
+```
+
+
+
+```{r include = FALSE}
+c1 <- round(r_anco$coefficients[1])  
+c2 <- round(r_anco$coefficients[2], 2)  
+c3 <- round(r_anco$coefficients[3])
+
+r_t <- round(cor(dfw$Pre, dfw$Post), 2)
+r_I <- round(cor(dfw$Pre[dfw$Group == "I"], dfw$Post[dfw$Group == "I"]), 2)
+r_C <- round(cor(dfw$Pre[dfw$Group == "C"], dfw$Post[dfw$Group == "C"]), 2)
+
+s_anco <- summary(r_anco)
+Tssq <- sum(s_anco[[1]][["Sum Sq"]])
+ssq <- s_anco[[1]][["Sum Sq"]]
+Rsquared <- round(1-(ssq[3]/Tssq),2)
+
+```
+## Coefficients
+
+```{r}
+r_anco$coefficients
+```
+
+
+
+## Formula
+
+```{r}
+
+print(noquote(paste0("Post = ", c1, " +", c2, "XPre ", c3, "XGroup-I")))  
+
+print(paste0("Coefficient of determination = ", Rsquared))
+```
+
+Coefficient of determination - $R^2$ $$R^2 = 1 - \frac{Res\ SSq}{Total\ SSq}$$\
+- Res SSQ - Residual/ Within group sum of squares\
+- Total SSq - Total sum of squares
+
+## Plot to assess Homogeniety of Variance
+
+```{r}
+plot(r_anco, 1)
+```
+
+## Plot to assess Normality
+
+```{r}
+plot(r_anco, 2)
+```
+
+## Normality
+
+Can be assessed by the Shapiro-Wilk normality test
+
+```{r}
+shapiro.test(residuals(r_anco))
+```
+
+## Scatterplot
+
+```{r}
+p1 + 
+  labs(caption = paste0("r all - ", r_t, "; r Group-I - ", r_I, "; r Group_C - ", r_C)) +
+  theme(plot.caption = element_text(size = 16))
+
+
+```
+
+## Method of analysis, power & sample size {.smaller}
+
+-   ANCOVA most powerful, therefore required sample size lowest\
+-   When the correlation between baseline & followup is high (r \~ 0.8) change score will have almost similar power\
+-   When the correlation between baseline & followup is low (r \< 0.3) comparison of followup score is more powerful than change score provided there is no baseline imbalance
+-   The method of analysis should be specified in the protocol. Trying all three to find a significant results is wrong.
+-   In general for this type of data ANCOVA is the method of choice
+
+## Latin square design
+
+|     | C1  | C2  | C3  | C4  |
+|-----|-----|-----|-----|-----|
+| R1  |     |     |     |     |
+| R2  |     |     |     |     |
+| R3  |     |     |     |     |
+| R4  |     |     |     |     |
+
+## Latin square design
+
+|     | C1  | C2  | C3  | C4  |
+|-----|-----|-----|-----|-----|
+| R1  | A   | B   | C   | D   |
+| R2  | B   | C   | D   | A   |
+| R3  | C   | D   | A   | B   |
+| R4  | D   | A   | B   | C   |
+
+How many different ways are possible?
+
+## Example 5x5x5 Latin square
+
+```{r}
+fertil <- c(rep("fertil1",1), rep("fertil2",1), rep("fertil3",1), rep("fertil4",1), rep("fertil5",1))
+till <- c(rep("treatA",5), rep("treatB",5), rep("treatC",5), rep("treatD",5), rep("treatE",5))
+seed <- c("A","E","C","B","D", "C","B","A","D","E", "B","C","D","E","A", "D","A","E","C","B", "E","D","B","A","C")
+yield <- c(42,45,41,56,47, 47,54,46,52,49, 55,52,57,49,45, 51,44,47,50,54, 44,50,48,43,46)
+
+df1 <- as_tibble(data.frame(till, fertil, seed, yield))
+
+df1
+```
+
+## Yeild by fertiliser
+```{r}
+df1 %>% 
+  dplyr::select(fertil, yield) %>% 
+  tbl_summary(by = fertil,
+              statistic = all_continuous() ~ "{mean} ({sd})",
+              digits = list(yield ~ c(1, 1)))
+```
+
+## Yeild by tillage
+```{r}
+df1 %>% 
+  dplyr::select(till, yield) %>% 
+  tbl_summary(by = till,
+              statistic = all_continuous() ~ "{mean} ({sd})",
+              digits = list(yield ~ c(1, 1)))
+```
+
+## Yeild by seed
+```{r}
+df1 %>% 
+  dplyr::select(seed, yield) %>% 
+  tbl_summary(by = seed,
+              statistic = all_continuous() ~ "{mean} ({sd})",
+              digits = list(yield ~ c(1, 1)))
+```
+
+## Plot
+
+```{r}
+pt <- ggplot(df1, aes(x=till, y=yield)) +
+geom_dotplot(binaxis='y', stackdir='center') +stat_summary(fun.y=median, geom="point", shape=18,
+size=3, color="yellow")
+
+ps <- ggplot(df1, aes(x=seed, y=yield)) +
+geom_dotplot(binaxis='y', stackdir='center') +stat_summary(fun.y=median, geom="point", shape=18,
+size=3, color="yellow")
+
+pf <- ggplot(df1, aes(x=fertil, y=yield)) +
+geom_dotplot(binaxis='y', stackdir='center') +stat_summary(fun.y=median, geom="point", shape=18,
+size=3, color="yellow")
+
+pf + ps + pt
+
+```
+
+
+## 3 way Anova
+
+```{r}
+a1 <- aov(yield ~ fertil + till + seed, data = df1)
+
+tidy(anova(a1)) %>% 
+  add_row(term = "Total", df = sum(.$df), sumsq = sum(round(.$sumsq))) %>% 
+  knitr::kable(digits = c(0, 0, 1, 1, 2, 4))
+```
+
