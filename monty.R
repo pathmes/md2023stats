@@ -1,6 +1,6 @@
 ## Simulate Monty Hall Puzzle
 
-mhp <- function(r=5) {
+mhf <- function(r=5) {
   n1 <- 0
   for ( i in 1:r) {
     door <- c(1,2,3)
