@@ -1,0 +1,7 @@
+"Day","treatment","Mean","SD","N"
+"0","Group A",260,77,14
+"0","Group B",244,61,12
+"5","Group A",340,85,14
+"5","Group B",289,70,12
+"Dif5-0","Group A",81,63,14
+"Dif5-0","Group B",46,73,12
