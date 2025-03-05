@@ -1,213 +1,229 @@
 ---
 title: "Sampling Methods"
-author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2024-02-08"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2025-02-10"
 format: 
   revealjs:
-   theme: [default, custom.scss]
-   footer: "MD Community Medicine 2024"
+   theme: [default, pgim2025.scss]
+   footer: "MD Community Medicine 2025"
+   slide-number: c/t
    embed-resources: true
    standalone: true
 ---
 
 ## Outline - Prospectus {.smaller}
 
-- Simple random sampling: Estimation of population mean, proportion & total
-- Probabilities proportional to size (PPS)
-- Stratified sampling: Estimation of population mean, proportion & optimal rule for choosing strata
-- Systematic sampling: Estimation of population mean, proportion & total
-- Cluster sampling: Estimation of population mean, proportion & total
-    a. Equal & unequal cluster size
-    b. PPS
-- Two stage cluster sampling
-- Cluster sampling combined with stratification
+-   Simple random sampling: Estimation of population mean, proportion & total
+-   Probabilities proportional to size (PPS)
+-   Stratified sampling: Estimation of population mean, proportion & optimal rule for choosing strata
+-   Systematic sampling: Estimation of population mean, proportion & total
+-   Cluster sampling: Estimation of population mean, proportion & total
+    a.  Equal & unequal cluster size
+    b.  PPS
+-   Two stage cluster sampling
+-   Cluster sampling combined with stratification
 
+## My Outline
 
-## My Outline  
-- Definitions  
-- Description of methods  
-- Specific issues  
-  
-## Sampling  
-- A __sample__ is a selected subset of the population that is used to gather information about the population.  
-  
-    
-  
-- __Sampling__ is the process of selecting a number of units from the population.  
-  
-   
-  
-- The term __population__ (or universe) refers to the whole collection of __units__ or __elements__ (Persons, Records, or Events).  
+-   Definitions\
+-   Description of methods\
+-   Specific issues
 
-## Populations  
-1. Reference population  
-2. Target population  
-3. Parent population  
-4. Sampled population  
-5. Study population  
+## Sampling
+
+-   A **sample** is a selected subset of the population that is used to gather information about the population.
+
+-   **Sampling** is the process of selecting a number of units from the population.
+
+-   The term **population** (or universe) refers to the whole collection of **units** or **elements** (Persons, Records, or Events).
+
+## Populations
+
+1.  Reference population\
+
+2.  Target population\
+
+3.  Parent population\
+
+    ------------------------------------------------------------------------
+
+4.  Sampled population\
+
+5.  Study population
 
 ## Benefits of Sampling
-- Reduction in time  
-- Reduction in labour  
-- Reduction in cost  
-- Improved quality of data  
 
-- Provided the sample is representative of the population  
+-   Reduction in time\
+-   Reduction in labour\
+-   Reduction in cost
 
-## Probability Sampling 1  
+. . .
 
-|Ideal      |Alternative |  
-|:----------|:-----------|
-|Epsem: equal probability for all elements |Unequal probabilities for different elements (use weights during analysis)|
-|a) Equal probabilities at all stages |a) Caused by irregularities in frames and/ or procedures|  
-|b) Equal overall probability achieved by compensating unequal probabilities at several stages |b) Disproportionate allocation designed for optimum allocation |  
+-   Improved quality of data
 
-## Probability Sampling 2  
+. . .
 
-|Ideal      |Alternative |  
-|:----------|:-----------|
-|Element Sampling: single stage & sampling unit contains only one element |Cluster Sampling: sampling units are clusters of elements|  
-|  |a) One-stage cluster sampling |
-|  |b) Subsampling or multistage sampling |
-|  |c) Equal clusters |
-|  |d) Unequal cluster |  
+-   Provided the sample is representative of the population
 
-## Probability Sampling 3  
+## Probability Sampling 1
 
-|Ideal      |Alternative |  
-|:----------|:-----------|
-|Unstratified Selection: sampling units selected from entire population |Stratified Sampling: separated selections from partitions or strata of population |  
+| Ideal | Alternative |
+|:-----------------------------------|:-----------------------------------|
+| Epsem: equal probability for all elements | Unequal probabilities for different elements (use weights during analysis) |
+| a\) Equal probabilities at all stages | a\) Caused by irregularities in frames and/ or procedures |
+| b\) Equal overall probability achieved by compensating unequal probabilities at several stages | b\) Disproportionate allocation designed for optimum allocation |
 
-## Probability Sampling 4  
+## Probability Sampling 2
 
-|Ideal      |Alternative |  
-|:----------|:-----------|
-|Random selection of individual sampling units from entire stratum or population |Systematic Selection of sampling units with selection interval applied to list | 
+| Ideal | Alternative |
+|:-----------------------------------|:-----------------------------------|
+| Element Sampling: single stage & sampling unit contains only one element | Cluster Sampling: sampling units are clusters of elements |
+|  | a\) One-stage cluster sampling |
+|  | b\) Subsampling or multistage sampling |
+|  | c\) Equal clusters |
+|  | d\) Unequal cluster |
 
-## Probability Sampling 5  
+## Probability Sampling 3
 
-|Ideal      |Alternative |  
-|:----------|:-----------|
-|One-Phase Sampling: final sample selected directly from entire population |Two-phase (or Double) Sampling: final sample selected from first phase sample which provides information for stratification or estimation |  
+| Ideal | Alternative |
+|:-----------------------------------|:-----------------------------------|
+| Unstratified Selection: sampling units selected from entire population | Stratified Sampling: separated selections from partitions or strata of population |
+
+## Probability Sampling 4
+
+| Ideal | Alternative |
+|:-----------------------------------|:-----------------------------------|
+| Random selection of individual sampling units from entire stratum or population | Systematic Selection of sampling units with selection interval applied to list |
+
+## Probability Sampling 5
+
+| Ideal | Alternative |
+|:-----------------------------------|:-----------------------------------|
+| One-Phase Sampling: final sample selected directly from entire population | Two-phase (or Double) Sampling: final sample selected from first phase sample which provides information for stratification or estimation |
 
 ## Simple Random Sampling
 
-- Requires a complete sampling frame (a listing of all units/ elements) and random numbers.  
-  + Never use a physical lottery to select elements  
-  
-\  
-  
-- Each element has equal probability of being selected.
+-   Requires a complete sampling frame (a listing of all units/ elements) and random numbers.
+    -   Never use a physical lottery to select elements
+
+ 
+
+-   Each element has equal probability of being selected.
 
 ## Perfect Sampling Frame
-- Every element appears separately
-- Once  
-- Only once  
-- Nothing else  
 
-## Perfect listing  
-- Every element must appear in a listing and only in one listing     
-\
+-   Every element appears separately
+-   Once\
+-   Only once\
+-   Nothing else
 
-- Every listing must contain an element and only one element  
+## Perfect listing
+
+-   Every element must appear in a listing and only in one listing\
+    \
+
+-   Every listing must contain an element and only one element
 
 ## Questions 1 {.flexbox .vcenter}
 
-1. Discuss the advantages and disadvantages of using the electoral register as the sampling frame to sample adults living in a district.  
+1.  Discuss the advantages and disadvantages of using the electoral register as the sampling frame to sample adults living in a district.
 
-2. Discuss the advantages and disadvantages of using the electoral register as the sampling frame to sample women aged 35 to 40 years living in a district.  
-
+2.  Discuss the advantages and disadvantages of using the electoral register as the sampling frame to sample women aged 35 to 40 years living in a district.
 
 ## Systematic Sampling
 
-- Random numbers are not required.  Every nth person from the sampling frame is selected.  
-- Useful in sampling
-  + Patients attending a clinic  
-  +  
-  
+-   Random numbers are not required. Every nth person from the sampling frame is selected.\
+-   Useful in sampling
+    -   Patients attending a clinic\
+    -   
 
-\    
+ 
 
-- __Caution:__ When the frame is organized according to some pattern and if the sampling interval overlaps this pattern ...   
+-   **Caution:** When the frame is organized according to some pattern and if the sampling interval overlaps this pattern ...
 
+## Cluster sampling
 
-## Cluster sampling   
-- The units are not selected in to the sample individually but as groups or clusters.   
-- This may be done when a complete sampling frame is not available but it is known that the units belong to some larger groupings.   
+-   The units are not selected in to the sample individually but as groups or clusters.\
+-   This may be done when a complete sampling frame is not available but it is known that the units belong to some larger groupings.
 
+## Cluster sampling
 
+-   Cluster size
+    -   Consider logistics
+    -   Check design effect
 
-## Cluster sampling  
-- Cluster size
-  + Consider logistics  
-  + Check design effect
+$$ Deff = [1 + (n - 1)\rho] $$ Deff - Design effect\
+n - cluster size\
+$\rho$ - Intraclass correlation coefficient\
+\* Assuming equal size clusters
 
-$$ Deff = [1 + (n - 1)\rho] $$  
-Deff - Design effect  
-n - cluster size  
-$\rho$ - Intraclass correlation coefficient  
-* Assuming equal size clusters  
+## Cluster sampling
 
-## Cluster sampling  
+-   Reasonably efficient if
+    -   there is low homogeneity within clusters
+    -   cluster size is small\
+-   Determining cluster size and the number of clusters
+-   Consider logistics
 
-- Reasonably efficient if 
-    - there is low homogeneity within clusters
-    - cluster size is small  
-- Determining cluster size and the number of clusters  
+## Stratified sampling
 
-## Stratified sampling  
+-   When it is known that the characteristic under investigation is related to another variable, the population under study could be stratified according to the second variable.
 
-- When it is known that the characteristic under investigation is related to another variable, the population under study could be stratified according to the second variable.  
+ 
 
-\    
+-   Proportionate allocation or not?
 
-- Proportionate allocation or not?
+## Clinical trials{.smaller}
+
+-   Selection of participants is not random
+-   Random allocation of individuals to treatment groups
+-   Random allocation within strata (each trial site can be considered a stratum)
+-   Cluster randomization (in field trials schools, PHM areas or clinics can be considered as clusters )
+
+. . .
+
+-   Block randomization (instead of random allocation of the whole list small blocks are created and random allocation is within these blocks) - ensures almost equal group sizes even if the trial is terminated early.
 
 ## Terminology
 
-![](fig3.jpeg){fig-align="center"}  
+![](fig3.jpeg){fig-align="center"}
 
 ## Multistage sampling
 
-- Selecting the sample in more than one stage.  Multistage sampling enables the investigator to concentrate/restrict the fieldwork to selected areas.
+-   Selecting the sample in more than one stage. Multistage sampling enables the investigator to concentrate/restrict the fieldwork to selected areas.
 
 ## Other Sampling methods
-- Area sampling
-- Quota sampling
-- Convenience sampling
 
-- Snowball sampling
-- Respondent driven sampling (RDS)
+-   Area sampling
 
-- All these are technical terms
-- In many instances combinations or modifications are necessary  
+-   Quota sampling
 
-## Questions 2   
-1. Discuss the issues that should be considered in designing the sample for a national survey on snakebite to obtain data at provincial level.  The total affordable sample size is 45,000 households.  
+-   Convenience sampling
 
-  
+-   Snowball sampling
 
-2. To determine the prevalence of STH infections among schoolchildren in each province of Sri Lanka, and in high risk populations in the plantation sector and low income settlements in urban areas. Total affordable sample size is about 4500 to 5500 children.  
+-   Respondent driven sampling (RDS)
 
-## Summary 
+-   All these are technical terms
 
-- The sample should be representative of the population
-- The sampling scheme should be taken into consideration during data analysis  
-  
+-   In many instances combinations or modifications are necessary
+
+## Questions 2
+
+1.  Discuss the issues that should be considered in designing the sample for a national survey on snakebite to obtain data at provincial level. The total affordable sample size is 45,000 households.
+
+2.  To determine the prevalence of STH infections among schoolchildren in each province of Sri Lanka, and in high risk populations in the plantation sector and low income settlements in urban areas. Total affordable sample size is about 4500 to 5500 children.
+
+## Summary
+
+-   The sample should be representative of the population
+-   The sampling scheme should be taken into consideration during data analysis
+
 ## Remember
 
-__"As you design, so should you analyse."__   
-  
-\n  
-
- `r tufte::quote_footer('--- Reviewer #4')`
-  
+> **"As you design, so should you analyse."**\
+> Reviewer #2
 
 ## Sample size for validation of a screening test
 
-An existing screening instrument to detect condition X is to be translated and validated for use in Sri Lanka. The reported sensitivity and specificity of this instrument are 90% and 85%, respectively. The research team has access to patients undergoing the diagnostic test. Usually, about 50% of those undergoing the diagnostic test are found to have condition X.   
+An existing screening instrument to detect condition X is to be translated and validated for use in Sri Lanka. The reported sensitivity and specificity of this instrument are 90% and 85%, respectively. The research team has access to patients undergoing the diagnostic test. Usually, about 50% of those undergoing the diagnostic test are found to have condition X.\
 Could you please help the research team calculate the sample size for this validation study?
-
-
-
-
-
