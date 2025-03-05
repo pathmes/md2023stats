@@ -1,0 +1,251 @@
+---
+title: "Logistic Regression I & II"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2025-02-28"
+format: 
+  revealjs:
+   theme: [default, pgim2025.scss]
+   footer: "MD Community Medicine 2023"
+   slide-number: c/t
+   embed-resources: true
+   standalone: true
+---
+
+```{r}
+#| label: loadPacks
+
+library(summarytools)
+library(gt)
+library(gtsummary)
+
+```
+
+```{r}
+#| label: getData
+
+source(here::here("kirkwood19.2.R"))
+```
+
+
+## Syllabus
+- Logistic regression model
+- interpretation of coefficients for dichotomous & continuous variables
+
+ . . .  
+ 
+- Multiple logistic regression:  
+  a. Wald test
+  b. Likelihood ratio test
+  c. Dummy variables
+  d. Model building strategies
+  e. Goodness of fit tests
+  
+## Logit
+
+Logit is equal to log of odds  
+If p is a proportion  
+
+$$logit(p) = log_e (\frac{p}{1-p})$$
+
+## Data from Kirkwoods book
+
+```{r}
+set.seed(21022025)
+t3[sample(nrow(t3), 7), ] |> 
+  kableExtra::kable(row.names = FALSE)
+```
+
+## MF postivity by area
+
+```{r}
+ctable(x = t3$Area,
+         y = t3$Microfilaria,
+       totals = F)
+```
+```{r}
+tx <- table(t3$Area, t3$Microfilaria)
+osv <- tx[1,2]/tx[1,1]
+orf <- tx[2,2]/tx[2,1]
+```
+
+ . . .  
+ 
+Odds of MF positivity in Rainforest - `r tx[2,2]` / `r tx[2,1]` = 
+`r round(orf, 2)`  
+Odds of MF positivity in Savannah - `r tx[1,2]` / `r tx[1,1]` = 
+`r round(osv, 2)`
+
+
+## Table with OR
+
+```{r}
+or_fun <- function(data, variable, by, ...) {
+  table(data[[by]], data[[variable]]) %>%
+    fisher.test() %>%
+    broom::tidy()
+}
+
+  t3 %>%
+  select(Microfilaria, Area) %>%
+  tbl_summary(by = Area, missing = "no", type = all_dichotomous() ~ "categorical") %>%
+  add_difference(test = Microfilaria ~ or_fun, estimate_fun = Microfilaria ~ style_ratio) %>%
+  modify_header(estimate ~ "**Odds Ratio**") |> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+```
+
+## Properties / Advantages of Odds Ratios
+
+1. When the outcome is rare the odds ratio is the same as the risk ratio
+2. The conclusions are identical whether the outcome is the occurence of an event or the absence of the event.
+2. Unlike the risk ratio the odds ratio is not constrained when the outcome is common in the unexposed group.
+
+## MF postivity by area 2
+
+```{r}
+ctable(x = t3$Area,
+         y = t3$Microfilaria,
+         OR = TRUE,
+         chisq = TRUE)
+```
+
+## Logistic regression{.smaller}
+
+### Odds Ratio in Case Control Studies
+$$\text{Odds Ratio} = \frac{\text{Odds of Exposure among Cases}}
+{\text{Odds of Exposure among Controls}}$$
+Same as  
+$$\text{Exposure Odds Ratio} = \frac{\text{Odds in Exposed Group}}
+{\text{Odds in Unexposed Group}}$$
+
+$$\text{Odds in Exposed Group} = \text{Odds in Unexposed Group} \times \text{Exposure Odds Ratio}$$
+
+## Logistic regression output
+
+
+::: {.panel-tabset}
+
+### Raw
+
+```{r}
+m1 <- glm(
+  Microfilaria ~ Area, 
+  data = t3, 
+  family = "binomial")
+summary(m1)
+```
+
+### OR
+
+```{r}
+exp(cbind(OR = coef(m1), confint(m1)))
+```
+
+### Print 1
+
+```{r}
+gtsummary::tbl_regression(m1)|> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+```
+
+
+### Print 2
+
+```{r}
+gtsummary::tbl_regression(m1, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+```
+
+:::
+
+
+
+## Birth Weight Data
+
+```{r}
+load("C:/AP/MyR/lectures/PGIM2/MD_CM_2023/md2023stats/bwt.RData")
+bwt$lbw <- bwt$bw < 2500
+bwt$ht_cm <- bwt$height*100
+bwt$ht_dm <- bwt$height*10
+
+bwt |> select(height, bw, lbw) |> 
+  tbl_summary(
+     type = all_continuous() ~ "continuous2",
+    statistic = all_continuous() ~ c("{median} ({p25}, {p75})", "{mean}, ({sd})")
+  ) |> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+```
+
+## Maternal height and LBW
+
+```{r}
+m2 <- glm(
+  lbw ~ ht_cm, 
+  data = bwt, 
+  family = "binomial")
+
+gtsummary::tbl_regression(m2, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+
+cbind(beta = coef(m2), confint(m2))
+exp(cbind(OR = coef(m2), confint(m2)))
+```
+
+## Maternal height (in dm) and LBW
+
+```{r}
+m3 <- glm(
+  lbw ~ ht_dm, 
+  data = bwt, 
+  family = "binomial")
+
+gtsummary::tbl_regression(m3, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+
+exp(cbind(OR = coef(m3), confint(m3)))
+```
+
+## LBW Predicted Probability 
+
+$$p = \frac{odds}{(1 + odds)}$$
+$$\text{Odds in Exposed Group} = \text{Odds in Unexposed Group} \times \text{Exposure Odds Ratio}$$
+
+Calculate the probability of LBW for mother's height = 140
+
+## LBW Predicted Probability for selected maternal heights
+
+```{r}
+h <- seq(130, 190, 10)
+cbind(h, exp(predict(m2, data.frame(ht_cm = h))))
+
+
+```
+
+## What if we had used a linear model
+```{r}
+mg <- glm(
+lbw ~ ht_cm,
+data = bwt,
+family = "gaussian")
+
+gtsummary::tbl_regression(mg, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+
+cbind(beta = coef(mg), confint(mg))
+exp(cbind(OR = coef(mg), confint(mg)))
+
+```
+
+## LBW Predicted Probability (based on linear regression) for selected maternal heights
+
+ . . .  
+ 
+ 
+```{r}
+cbind(h, exp(predict(mg, data.frame(ht_cm = h))))
+```

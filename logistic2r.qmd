@@ -1,0 +1,450 @@
+---
+title: "Logistic Regression III & IV"
+author: "A Pathmeswaran<br>pathmes@kln.ac.lk<br>2025-03-04"
+format: 
+  revealjs:
+   theme: [default, pgim2025.scss]
+   footer: "MD Community Medicine 2025"
+   slide-number: c/t
+   embed-resources: true
+   standalone: true
+---
+
+```{r}
+#| label: loadPacks
+library(tidyverse)
+library(summarytools)
+library(gt)
+library(gtsummary)
+library(aod)
+library(texreg)
+library(rcompanion)
+# library(generalhoslem)
+```
+
+
+## Syllabus
+- Logistic regression model
+- interpretation of coefficients for dichotomous & continuous variables
+- Multiple logistic regression:  
+  a. Wald test
+  b. Likelihood ratio test
+  c. Dummy variables
+  d. Model building strategies
+  e. Goodness of fit tests
+  
+## Logit
+
+Logit is equal to log of odds  
+If p is a proportion  
+
+$$logit(p) = log_e (\frac{p}{1-p})$$
+
+
+
+
+
+## Properties / Advantages of Odds Ratios
+
+1. When the outcome is rare the odds ratio is the same as the risk ratio
+2. The conclusions are identical whether the outcome is the occurence of an event or the absence of the event.
+2. Unlike the risk ratio the odds ratio is not constrained when the outcome is common in the unexposed group.
+
+
+
+## Birth Weight Data
+
+```{r}
+load("C:/AP/MyR/lectures/PGIM2/MD_CM_2023/md2023stats/bwt.RData")
+bwt$lbw <- bwt$bw < 2500
+bwt$ht_cm <- bwt$height*100
+bwt$ht_dm <- bwt$height*10
+
+bwt |> 
+  select(height, bw, lbw) |> 
+  tbl_summary(
+     type = all_continuous() ~ "continuous2",
+    statistic = all_continuous() ~ c("{median} ({p25}, {p75})", "{mean}, ({sd})")
+  ) |> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+```
+
+## Maternal height and LBW
+
+```{r}
+m2 <- glm(
+  lbw ~ ht_cm, 
+  data = bwt, 
+  family = "binomial")
+
+int <- as.numeric(m2$coefficients[1])
+beta <- as.numeric(m2$coefficients[2])
+
+
+gtsummary::tbl_regression(m2, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+
+cbind(beta = coef(m2), confint(m2))
+exp(cbind(OR = coef(m2), confint(m2)))
+```
+
+## Maternal height (in dm) and LBW
+
+```{r}
+m3 <- glm(
+  lbw ~ ht_dm, 
+  data = bwt, 
+  family = "binomial")
+
+gtsummary::tbl_regression(m3, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+
+exp(cbind(OR = coef(m3), confint(m3)))
+```
+
+## LBW Predicted Probability 
+
+$$p = \frac{odds}{(1 + odds)}$$
+$$Odds_\text{ Exposed Group} = Odds_\text{ Unexposed Group} \times OR$$
+
+Calculate the probability of LBW for mother's height = 140
+
+## Predicted Odds
+
+$$Odds_\text{ Exposed Group} = Odds_\text{ Unexposed Group} \times OR$$
+
+$$Odds_\text{(Maternal Height = 140)} = Odds_\text{ Unexposed Group} \times OR_{Height}^{ 140}$$
+
+
+$$Odds_\text{(Maternal Height = 140)} = e^{(Intercept + beta_{Height} \times 140)}$$
+```{r}
+#| echo: true
+
+oddsH140 <- exp(int + beta*140)
+print(paste("Maternal Height 140 cm - Odds of LBW =", round(oddsH140, 3)))
+Pr140 <- oddsH140/ (1 + oddsH140)
+print(paste("Maternal Height 140 cm - Probability of LBW =", round(Pr140, 2)))
+```
+
+
+
+
+## LBW Predicted Probability for selected maternal heights
+
+```{r}
+h <- c(round(mean(bwt$ht_cm),1), seq(140, 180, 10))
+pt <- cbind(h, exp(predict(m2, data.frame(ht_cm = h))),
+      predict(m2, data.frame(ht_cm = h), type = "response"))
+
+colnames(pt) <- c("Height", "P_odds", "P_pob")
+as_tibble(pt) |>
+  kableExtra::kable(digits = c(1, 3, 3))
+```
+
+## What if we had used a linear model {visibility="hidden"}
+```{r}
+mg <- glm(
+lbw ~ ht_cm,
+data = bwt,
+family = "gaussian")
+
+gtsummary::tbl_regression(mg, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+
+cbind(beta = coef(mg), confint(mg))
+exp(cbind(OR = coef(mg), confint(mg)))
+
+```
+
+## LBW Predicted Probability (based on linear regression) for selected maternal heights {visibility="hidden"}
+
+ . . .  
+ 
+ 
+```{r}
+cbind(h, exp(predict(mg, data.frame(ht_cm = h))))
+```
+
+## Birthweight by Maternal Education
+
+```{r}
+bwt$edu <- as.character(bwt$education)
+bwt$edu3 <- case_match(
+bwt$edu,
+c("TEC", "GDU", "PG", "1-5", "6-8") ~ "e1",
+c("8-10", "OL") ~ "e2",
+c("AL", "NONE" ) ~ "e3"
+)
+
+bwt$edu3[bwt$idn == 54] <- "e3"
+bwt$edu3[bwt$idn == 66] <- "e3"
+bwt$edu3[bwt$idn == 182] <- "e3"
+bwt$edu3[bwt$idn == 239] <- "e3"
+bwt$edu3[bwt$idn == 259] <- "e3"
+bwt$edu3[bwt$idn == 261] <- "e3"
+bwt$edu3[bwt$idn == 432] <- "e3"
+
+m5 <- glm(
+lbw ~ edu3,
+data = bwt,
+family = "binomial")
+
+bwt |> 
+  select(lbw, edu3)  |> 
+  tbl_summary(by = edu3, missing = "no", type = all_dichotomous() ~ "categorical") |> 
+as_gt() |> 
+tab_options(table.font.size = 32)
+
+```
+
+## LBW by Education - Logistic Regression
+```{r}
+gtsummary::tbl_regression(m5, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+
+cbind(beta = coef(m5))
+exp(cbind(OR = coef(m5)))
+```
+## Overall effect of education on LBW
+
+- Above results show that   
+  - e1 & e3 difference significant
+  - e1 & e2 difference is not significant
+- What is the overall effect of maternal education on LBW?  
+
+```{r}
+#| echo: true
+wald.test(b = coef(m5), Sigma = vcov(m5), Terms = 2:3)
+```
+
+## Is the difference between e2 & e3 significant?
+
+- We already have the results for e1 vs e2 and e1 vs e3
+
+```{r}
+l <- cbind(0, 1, -1)
+wald.test(b = coef(m5), Sigma = vcov(m5), L = l)
+```
+## Log likelihood ratio test
+- Log likelihood is a negative number
+- A model with a better fit will have a log likelyhood closer to zero
+$$LR = -2ln(\frac{L(m_1)}{L(m_2)})= 2(loglik(m_2) - loglik(m_1))$$
+
+
+## Log likelihood test (predictor - education)
+
+### Likelihood ratio test
+```{r}
+
+logLik(m5)
+with(m5, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
+```
+
+### Pseudo R squared
+
+```{r}
+nagelkerke(m5)$Pseudo.R.squared.for.model.vs.null
+```
+
+
+## Log likelihood test (predictor - height)
+
+### Likelihood ratio test
+```{r}
+
+logLik(m2)
+with(m2, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
+
+```
+### Pseudo R squared
+
+```{r}
+nagelkerke(m2)$Pseudo.R.squared.for.model.vs.null
+```
+
+
+## LBW by Education & Maternal Height - Logistic Regression
+
+```{r}
+m6 <- glm(
+lbw ~ edu3 + ht_cm,
+data = bwt,
+family = "binomial")
+
+gtsummary::tbl_regression(m6, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+
+```
+## LBW by Education & Maternal Height - Logistic Regression - Coefficients
+
+```{r}
+cbind(beta = coef(m6), confint(m6))
+exp(cbind(OR = coef(m6), confint(m6)))
+```
+
+## Log likelihood test (predictors(height & education))
+
+### Likelihood ratio test
+```{r}
+
+logLik(m6)
+with(m6, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
+
+nagelkerke(m6)$Pseudo.R.squared.for.model.vs.null
+```
+
+
+
+
+
+
+
+## Compare {.scrollable}
+
+```{r}
+#| results = "asis"
+htmlreg(list(m2, m5, m6))
+```
+
+
+## Other predictors
+
+```{r}
+bwt |> 
+  select(weight, midacir, fundht) |> 
+  tbl_summary(
+     type = all_continuous() ~ "continuous2",
+    statistic = all_continuous() ~ c("{median} ({p25}, {p75})", "{mean}, ({sd})")
+  ) |> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+```
+
+
+
+## Comparison of models {.scrollable}
+
+```{r}
+m4 <- glm(
+lbw ~ weight,
+data = bwt,
+family = "binomial")
+
+m7 <- glm(
+lbw ~ midacir,
+data = bwt,
+family = "binomial")
+
+m8 <- glm(
+lbw ~ fundht,
+data = bwt,
+family = "binomial")
+
+```
+
+```{r}
+#| results = "asis"
+htmlreg(list(m2, m4, m7, m8))
+```
+
+
+
+## Comparison (Fundal height +) {.scrollable}
+
+```{r}
+f1 <- glm(
+lbw ~ fundht + ht_cm,
+data = bwt,
+family = "binomial")
+
+f2 <- glm(
+lbw ~ fundht + weight,
+data = bwt,
+family = "binomial")
+
+f3 <- glm(
+lbw ~ fundht + midacir,
+data = bwt,
+family = "binomial")
+```
+
+```{r}
+#| results = "asis"
+htmlreg(list(m8, f1, f2, f3))
+```
+
+## Pseudo R squared for a few models {.scrollable}
+
+```{r}
+nagelkerke(m8)$Models[1]
+nagelkerke(m8)$Pseudo.R.squared.for.model.vs.null
+
+nagelkerke(f1)$Models[1]
+nagelkerke(f1)$Pseudo.R.squared.for.model.vs.null
+
+nagelkerke(f2)$Models[1]
+nagelkerke(f2)$Pseudo.R.squared.for.model.vs.null
+
+nagelkerke(f3)$Models[1]
+nagelkerke(f3)$Pseudo.R.squared.for.model.vs.null
+```
+
+## Goodness of fit
+
+- p > 0.05 No evidence of poor fit
+```{r}
+m3$formula
+generalhoslem::logitgof(bwt$lbw, fitted(m3))
+
+m8$formula
+generalhoslem::logitgof(bwt$lbw, fitted(m8), g = 3)
+
+f2$formula
+generalhoslem::logitgof(bwt$lbw, fitted(f2))
+
+```
+
+
+
+
+## Is the improvement significant? {.scrollable}
+### Should we add weight as a predictor?
+```{r}
+
+anova(m8, f2, test='LR')
+
+```
+
+## Is the improvement significant? {.scrollable}
+### Should we add mid arm circumference as a predictor?
+```{r}
+
+anova(m8, f3, test='LR')
+
+```
+
+## LBW by Education & Maternal Height interaction - Logistic Regression {.scrollable}
+
+```{r}
+m11 <- glm(
+lbw ~ edu3 * ht_cm,
+data = bwt,
+family = "binomial")
+
+gtsummary::tbl_regression(m11, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 32)
+
+```
+
+```{r}
+#| results = "asis"
+htmlreg(m11)
+```
+
