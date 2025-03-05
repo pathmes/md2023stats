@@ -91,7 +91,7 @@ s256r100 <- results %>%
             Mean = mean(r), SD = sd(r))
 s256r100
 
-hist(results$r, 10,
+hist(results$r, 6,
      col = "lightgray",
      main = "Distribution of Sample Means (N = 100)",
      sub = paste0("Mean of sample means = ", round(mean(results$r),1),
