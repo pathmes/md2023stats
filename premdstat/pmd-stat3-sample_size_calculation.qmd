@@ -1,0 +1,430 @@
+---
+title: Sample Size Calculation
+format: clean-typst
+bibliographystyle: "apa"
+author:
+  - name: A Pathmeswaran
+    orcid: 0000-0003-4065-2639
+    email: pathmes@kln.ac.lk
+date: 2026-02-13
+date-format: long
+bibliography: [static/references.bib]
+brand:
+  typography: 
+    fonts: 
+      - family: Roboto
+        weight: [100, 200, 300, 400, 500, 600, 700]
+        style: [normal, italic]
+        source: google
+    base: Roboto
+    headings: Roboto
+---
+
+### Outline
+
+1.  Properties of samples\
+2.  Confidence intervals & P values\
+3.  Type I error (level of significance)\
+4.  Type II error (power)
+5.  Importance of calculating sample size
+6.  Calculating the sample size for
+    -   Descriptive studies\
+    -   Cross-sectional analytical studies
+    -   Case control studies, Cohort studies & Clinical trials\
+7.  Presenting the sample size calculation
+8.  Common mistakes
+
+### Estimating a population parameter
+
+-   If we take a large sample, will the sample mean be exactly equal to the population mean?\
+-   If we take two large samples of equal size, will the two sample means be exactly the same?\
+-   If we calculate the mean value by measuring everyone in the population and repeat the process, will we get the same value?
+
+```{r}
+#| label: setup
+#| include: false
+library(tinytable)
+library(tinyplot)
+source(here::here("sim_sample_V1.0.R"))
+
+```
+
+### Marks of 10,000 students
+
+```{r}
+#| label: all-10000
+#| echo: false
+#| fig-width: 12
+#| fig-height: 5
+
+popm <- round(mean(a),1)
+popsd <- round(sd(a),1)  
+plt(a, 
+    type = type_hist(breaks = 10), 
+    xlab = "",
+    sub = paste0("Mean = ", round(mean(a),1),
+                 "; SD = ", round(sd(a),1),
+                 "; Min = ", min(a),
+                 "; Max = ", max(a)), cex.sub = 2
+     ) 
+```
+
+## Samples of size 64
+
+### Number of repetitions 100
+
+```{r}
+#| label: r64100
+#| echo: false
+#| fig-width: 12
+#| fig-height: 5
+
+plt(r64100, 
+     type = type_hist(breaks = 10),
+     main = "Distribution of Sample Means (N = 100)",
+     sub = paste0("Mean of sample means = ", round(mean(r64100),1),
+                  ";  ",
+                  "SD of sample means = ", round(sd(r64100),2),
+                  ";  ",
+                  "Size of samples = 64"),
+     xlab = NULL,
+     cex.sub = 1.5)
+```
+
+### Samples of size 64
+
+#### Number of repetitions 100
+
+```{r}
+#| echo: false
+tt(s64r100, digits = 3, width = .8) |> 
+format_tt(j = 2:5, fn = function(x) sprintf("%.1f", x)) |>   
+  style_tt(fontsize = 1.5)
+```
+
+What will be the minimum value of the sample means if we repeat this process **1000** times?\
+It will be\
+1. Lower than 45.0\
+2. Higher than 45.0\
+3. Cannot be predicted
+
+### Samples of size 64
+
+```{r}
+#| echo: false
+#| fig-width: 12
+#| fig-height: 5
+plt(r641000, 
+    type = type_hist(breaks = 20),
+     main = paste0("Distribution of Sample Means (N = ", length(r641000), ")"),
+    sub = paste0("Mean = ", round(mean(r641000),1),
+             ";  SD = ", round(sd(r641000),2),
+             ";  Minimum = ", round(min(r641000),1),
+             ";  Maximum = ", round(max(r641000),1)
+             ),
+     xlab = "")
+
+```
+
+### Samples of size 64
+
+#### Number of repetitions 1000
+
+```{r}
+#| echo: false
+tt(s64r1000, digits = 3, nsmall = 1, width = .8) |> 
+  format_tt(j = 2:5, fn = function(x) sprintf("%.1f", x)) |>   
+  style_tt(fontsize = 1.5)
+```
+
+### Samples of size 64
+
+#### Number of repetitions 100
+
+```{r}
+#| echo: false
+
+tt(s64r100, width = .8) |> 
+  format_tt(j = 2:5, fn = function(x) sprintf("%.1f", x)) |> 
+  style_tt(fontsize = 1.5) 
+```
+
+What will be the minimum value of the sample means if we repeat this process 100 times with a sample size of **256**?\
+It will be\
+1. Lower than 45.0\
+2. Higher than 45.0\
+3. Cannot be predicted
+
+### Sample size 256 & repetitions 100
+
+```{r}
+#| echo: false
+#| fig-width: 12
+#| fig-height: 5
+plt(r256100, 
+    type = type_hist(breaks = 7),
+     main = "Distribution of Sample Means (N = 100)",
+     sub = paste0("Mean of sample means = ", round(mean(r256100),1),
+                  ";  ",
+                  "SD of sample means = ", round(sd(r256100),2),
+                  ";  ",
+                  "Size of samples = 256"),
+     xlab = "")
+```
+
+### Sample size 256 & repetitions 100
+
+```{r}
+#| echo: false
+
+tt(s256r100, digits = 3, width = .8) |> 
+format_tt(j = 2:5, fn = function(x) sprintf("%.1f", x)) |>   style_tt(fontsize = 1.5) 
+```
+
+### Sample size 256 & repetitions 1000
+
+```{r}
+#| echo: false
+
+tt(s256r1000, digits = 3, width = .8) |> 
+format_tt(j = 2:5, fn = function(x) sprintf("%.1f", x)) |>   style_tt(fontsize = 1.5) 
+```
+
+### Summary of simulation
+
+```{r}
+#| echo: false
+
+tt(z, digits = 3, width = .8, height = 2) |> 
+format_tt(j = 3:6, fn = function(x) sprintf("%.1f", x)) |> 
+  style_tt(fontsize = 1.5, align = 'r') 
+```
+
+::: {.callout-note appearance="simple"}
+## 
+
+Population Mean = `r popm`, SD = `r popsd`
+:::
+
+### Estimation and Inference
+
+-   We are not interested in the sample statistics for their own sake.\
+-   We are interested in the population parameter.
+    -   Confidence interval or
+    -   P value
+
+### 95% Confidence Interval
+
+-   We know that the mean calculated from repeated samples of the same size forms a Normal distribution.\
+-   The mean of these means will be equal to the population mean, and the standard deviation of these sample means is called the standard error.
+-   Therefore, 95% of the sample means will be within 1.96 standard errors of the population mean.\
+-   The probability of any particular sample mean being within 1.96 standard errors of the population mean is 95%.
+
+### Type I Error and the Level of Significance
+
+-   The probability of rejecting a true null hypothesis.\
+-   This is equal to the P value.\
+-   We can reduce the probability of a Type I error by setting the level of significance to P \< 0.01.
+
+### Type II Error and Power
+
+-   Even when there is a difference between the means of two groups, we may fail to detect this difference (fail to reject the null hypothesis) in a particular study.\
+-   The probability of failing to detect a true difference is called the Type II error.\
+-   We fail to reject the null hypothesis because we lack sufficient evidence against it.\
+-   A common reason for this is inadequate sample size.
+
+### Importance of calculating sample size
+
+-   Inadequate sample size leads to inconclusive results.\
+-   An unnecessarily large sample size wastes resources.\
+-   When should we calculate the sample size?
+    -   At the time of protocol development\
+    -   Consider it along with the objectives
+
+. . .
+
+-   @norman2012 propose an alternative.
+
+### How to calculate?
+
+-   Use formulae and calculate
+    -   Using a calculator or MS Excel - Risky and not reproducible
+-   Use appropriate software
+    -   Winpepi
+    -   OpenEpi
+    -   Many others ....\
+-   Use published tables
+    -   Lwanga & Lemeshow
+
+### Sample Size Calculation for a Descriptive Study
+
+-   To determine a mean or percentage along with the 95% confidence interval.
+
+-   Is the 95% confidence interval acceptable?
+
+### Sample Size Calculation for a Descriptive Study
+
+-   To determine a percentage along with the 95% confidence interval.
+-   Expected percentage 50%
+-   Desired 95% CI 45% to 55%
+
+Is the 95% confidence interval acceptable?
+
+What if you can afford only a particular sample size?
+
+Can we go ahead and do a prevalence study if the maximum possible sample size is 200?
+
+### What if you can afford only 200 participants?
+
+```{r}
+#| echo: false
+
+fxssv <- function(p = 10, n = 200) {
+  pp <- round(p*n/100)
+  a <- binom.test(pp, n)
+  return(c(prev = p,
+           ssize =n,
+           lci = round(a$conf.int[1]*100, 1),
+           uci = round(a$conf.int[2]*100, 1)))
+}
+
+p <- seq(10, 50, 10)
+a <- lapply(p, fxssv)
+data.frame(do.call(rbind, a)) |> tt(width = .8, height = 2) |> 
+  style_tt(fontsize = 1.5, align = 'r')
+
+
+```
+
+### What if you can afford only 200 participants?
+
+#### with low prevalence
+
+```{r}
+#| echo: false
+
+
+
+p <- seq(1, 5, 1)
+a <- lapply(p, fxssv)
+data.frame(do.call(rbind, a)) |> tt(width = .8, height = 2) |> 
+  style_tt(fontsize = 1.5, align = 'r')
+
+
+```
+
+### Sample Size Calculation for Analytical Studies
+
+-   Cross sectional\
+-   Cohort\
+-   Case control\
+-   Clinical trial
+-   All these can be expressed as the difference between two proportions
+-   Cross-sectional studies & Clinical trials can be the difference between two means.
+
+## Designs
+
+------------------------------------------------------------------------
+
+![](designs2019.png)
+
+### Analytical study
+
+-   Level of significance (usually 0.05)
+-   Power (either 80% or 90%)
+-   Expected difference\
+-   Difference between two means
+    -   Estimates of the two standard deviations
+-   The difference between the two proportions
+    -   Estimates of the two proportions
+
+### Increasing power without increasing sample size
+
+1.  How to do it?\
+2.  What are the consequences?
+
+### Sample Size Calculation for a Case-Control Study
+
+"We wanted to identify factors that doubled the risk of home deliveries and had a 50% prevalence in the community. Sample size was determined using Epi Info version 6. With 95% confidence and power of 80%, the calculated minimum sample size was 111 cases and 222 controls."\
+(Lukumar 2006)
+
+### Sample Size Calculation for a Clinical Trial
+
+-   Treatment of metastatic prostate cancer\
+-   Orchidectomy vs Orchidectomy + Drug A\
+-   Outcome - Time to recurrence (Increase in PSA)
+-   Follow-up - 18 months
+-   Information needed?
+
+. . .
+
+Information needed - % with recurrence following Orchidectomy in 18 months & improvement expected by adding Drug A
+
+### Other issues
+
+-   Design effect\
+-   Unequal-sized groups
+-   More than two groups
+
+### Writing it up
+
+-   From -Statistics Guide for Research Grant Applicants
+-   A sample of 324 patients with asthma will be required to obtain a 95% confidence interval of +/- 5% around a prevalence estimate of 30%. To allow for an expected 70% response rate to the questionnaire, a total of 480 questionnaires will be delivered.
+
+<http://www-users.york.ac.uk/~mb55/guide/size.htm#est>
+
+### Another example
+
+-   A sample size of 292 babies (146 in each of the treatment and placebo groups) will be sufficient to detect a difference of 16% between groups in the sepsis rate at 14 days, with 80% power and a 5% significance level. This 16% difference represents the difference between a 50% sepsis rate in the placebo group and a 34% rate in the treatment group.
+
+<http://www-users.york.ac.uk/~mb55/guide/size.htm#est>
+
+### Presenting/ Reviewing sample size calculation
+
+-   Enough information to independently verify the calculation?
+-   Background values justified/ referenced?
+-   Effect size 'clinically' relevant?
+-   Effect size realistic?
+
+### Common mistakes
+
+-   Assuming 50% prevalence
+-   Not providing all the information needed to confirm the calculation
+-   Reproducing an obscure formula without a legend
+
+### Calculated sample size vs reality
+
+#### Methods
+
+We assumed a 10% death rate in patients admitted with yellow oleander poisoning on the basis of previously published results. We expected treatment to reduce the death rate to 2·5%. Thus, we calculated that a sample size of 376 was needed to give the study 80% power at α=0·05.
+
+. . .
+
+#### Results
+
+Fewer patients died in the treatment group than did on placebo (5/200 \[2·5%\] vs 16/201 \[8%\]; p=0·025).
+
+### Calculated sample size vs reality 2
+
+#### Methods
+
+We expected the 2-week treatment to increase the eradication rate from 60% to 90%. Thus we calculated that a sample size of 76 was needed to give the study 80% power at α = 0.05.
+
+. . .
+
+#### Results
+
+36 out of 42 (85.7%; 95% CI 72.2–93.3) patients in the 1-week treatment group (Group A) and 36 out of 40 (90%; 95% CI 76.9–96) patients in the 2-week treatment group (Group B) were cured of H. pylori infection. The difference (4.3%) was not statistically significant (p = 0.9).
+
+### Other useful resources
+
+-   CONSORT and other guidelines
+-   Protocol papers
+-   Clinical trial protocols\
+-   Online calculator for a few common situations - [Online calculator](https://pathmes.github.io/Sample-Size-Home/)\
+-   Introduction to sample size calculation - [My sample size website](https://pathmes.quarto.pub/sample-size-calculation/)
+
+### References
+
+::: {#refs}
+:::
