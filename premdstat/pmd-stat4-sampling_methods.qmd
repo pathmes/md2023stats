@@ -2,7 +2,7 @@
 title: Sampling Methods
 format: 
   clean-typst:
-    bibliographystyle: "chicago-author-date"
+    bibliographystyle: "apa"
     include-in-header: "custom.typ"
     commands: [small-cite]
 execute: 
@@ -12,7 +12,7 @@ author:
   - name: A Pathmeswaran
     orcid: 0000-0003-4065-2639
     email: pathmes@kln.ac.lk
-date: 2026-02-23
+date: 2026-02-24
 date-format: long
 bibliography: [static/references.bib]
 handout: false
@@ -28,6 +28,14 @@ brand:
 ---
 
 
+```{r}
+#| label: packages 
+#| echo: false
+#| message: false
+#| warning: false
+
+suppressMessages(library(tinytable))
+```
 
 
 
@@ -86,7 +94,7 @@ brand:
 -   Provided the sample is representative of the population
 
 
-### Probability Sampling 1
+### Probability Sampling - Terminology 1
 
 ```{r}
 
@@ -102,36 +110,128 @@ tab1 <- data.frame(
   )
 )
 
-tinytable::tt(tab1, theme = "striped") 
+tab1nh <- tab1
+colnames(tab1nh) <- NULL
+tt(tab1nh) |> 
+  style_tt(fontsize = 1.2) |> 
+  style_tt(i = 2, j = 2,
+           line = "tb",
+           line_width = 0.05,
+           line_color = "grey")
 ```
 
-### Probability Sampling 2
+### Exercise 1
 
-| Ideal | Alternative |
-|:-----------------------------------|:-----------------------------------|
-| Element Sampling: single stage & sampling unit contains only one element | Cluster Sampling: sampling units are clusters of elements |
-|  | a\) One-stage cluster sampling |
-|  | b\) Subsampling or multistage sampling |
-|  | c\) Equal clusters |
-|  | d\) Unequal cluster |
+```{r}
+x <- seq(1000, 3000, 100)
+set.seed(123)
+x8 <- sort(sample(x, 8, replace = TRUE))
+x8[7] <- 2000
+x8 <- sort(x8)
 
-### Probability Sampling 3
+d1 <- data.frame(GN = LETTERS[1:8],
+                  pop= x8)
+tt(d1)
+```
+- Total population - `r noquote(sprintf("%.0f", sum(d1$pop)))`  
+- Sample size of 400 to be selected in two stages - select four GN divisions and then select the individuals from those four GN divisions.
+- How would you select an epsem sample?
 
-| Ideal | Alternative |
-|:-----------------------------------|:-----------------------------------|
-| Unstratified Selection: sampling units selected from entire population | Stratified Sampling: separated selections from partitions or strata of population |
+### Exercise 1 
 
-### Probability Sampling 4
+```{r}
+d1$C_pop <- cumsum(d1$pop)
+tt(d1) |> style_tt(j = 2:3, align = 'r')
+```
 
-| Ideal | Alternative |
-|:-----------------------------------|:-----------------------------------|
-| Random selection of individual sampling units from entire stratum or population | Systematic Selection of sampling units with selection interval applied to list |
 
-### Probability Sampling 5
+### Probability Sampling - Terminology 2
 
-| Ideal | Alternative |
-|:-----------------------------------|:-----------------------------------|
-| One-Phase Sampling: final sample selected directly from entire population | Two-phase (or Double) Sampling: final sample selected from first phase sample which provides information for stratification or estimation |
+```{r}
+tab1 <- data.frame(
+  Ideal = c(
+    "Element Sampling: single stage & sampling unit contains only one element",
+    "",
+    "",
+    "",
+    ""
+    ),
+  Alternative = c("Cluster Sampling: sampling units are clusters of elements",
+                  "a) One-stage cluster sampling",
+                  "b) Subsampling or multistage sampling",
+                  "c) Equal clusters",
+                  "d) Unequal cluster"
+  )
+)
+
+tab1nh <- tab1
+colnames(tab1nh) <- NULL
+tt(tab1nh) |> 
+  style_tt(fontsize = 1.2) |> 
+  style_tt(i = 2:4, j = 2,
+           line = "tb",
+           line_width = 0.05,
+           line_color = "grey")
+```
+
+
+
+### Probability Sampling - Terminology 3
+
+```{r}
+
+tab1 <- data.frame(
+  Ideal = c(
+    "Unstratified Selection: sampling units selected from entire population"),
+  Alternative = c(
+    "Stratified Sampling: separated selections from partitions or strata of population"
+  )
+)
+
+tab1nh <- tab1
+colnames(tab1nh) <- NULL
+tt(tab1nh) |> 
+  style_tt(fontsize = 1.2) 
+```
+
+### Probability Sampling - Terminology 4
+
+
+```{r}
+
+tab1 <- data.frame(
+  Ideal = c(
+    "Random selection of individual sampling units from entire stratum or population"),
+  Alternative = c(
+    "Systematic Selection of sampling units with selection interval applied to list"
+  )
+)
+
+tab1nh <- tab1
+colnames(tab1nh) <- NULL
+tt(tab1nh) |> 
+  style_tt(fontsize = 1.2) 
+```
+
+
+### Probability Sampling - Terminology 5
+
+```{r}
+
+tab1 <- data.frame(
+  Ideal = c(
+    "One-Phase Sampling: final sample selected directly from entire population"),
+  Alternative = c(
+    "Two-phase (or Double) Sampling: final sample selected from first phase sample which provides information for stratification or estimation"
+  )
+)
+
+tab1nh <- tab1
+colnames(tab1nh) <- NULL
+tt(tab1nh) |> 
+  style_tt(fontsize = 1.2) 
+```
+
 
 ### Simple Random Sampling
 
@@ -156,7 +256,7 @@ tinytable::tt(tab1, theme = "striped")
 
 -   Every listing must contain an element and only one element
 
-### Questions 1 {.flexbox .vcenter}
+### Questions 1
 
 1.  Discuss the advantages and disadvantages of using the electoral register as the sampling frame to sample adults living in a district.
 
@@ -205,6 +305,22 @@ $\rho$ - Intraclass correlation coefficient\
 
 -   Proportionate allocation or not?
 
+### Malnutrition by sector
+
+In 2022, the prevalence of underweight among chidren under 5 was reported as - 
+
+- Estate sector 25%
+- Rural sector 15%
+- Urban sector 10%
+
+Calculate the national prevalence of underweight.
+
+. . .   
+
+The sectorwise distribution of the population -  
+Estate 5%, Rural 75% and Urban 20%
+
+
 ### Clinical trials{.smaller}
 
 -   Selection of participants is not random
@@ -242,21 +358,29 @@ $\rho$ - Intraclass correlation coefficient\
 
 ### Questions 2
 
-1.  Discuss the issues that should be considered in designing the sample for a national survey on snakebite to obtain data at provincial level. The total affordable sample size is 45,000 households.
+Discuss the issues that should be considered in designing the sample for - 
 
-2.  To determine the prevalence of STH infections among schoolchildren in each province of Sri Lanka, and in high risk populations in the plantation sector and low income settlements in urban areas. Total affordable sample size is about 4500 to 5500 children.
+1. a national survey on snakebite to obtain data at provincial level. The total affordable sample size is 45,000 households.
+
+2. a survey to determine the prevalence of STH infections among schoolchildren in each province of Sri Lanka, and in high risk populations in the plantation sector and low income settlements in urban areas. Total affordable sample size is about 5000 children.
+
+
+### Remember
+
+
+::: {.block fill="luma(221)" inset="8pt" radius="4pt"}
+
+"As you design, so should you analyse." Reviewer #2
+:::
 
 ### Summary
 
 -   The sample should be representative of the population
 -   The sampling scheme should be taken into consideration during data analysis
 
-### Remember
-
-> **"As you design, so should you analyse."**\
-> Reviewer #2
+[Statistics Canada](https://www150.statcan.gc.ca/n1/edu/power-pouvoir/ch13/prob/5214899-eng.htm)
 
 ### Sample size for validation of a screening test
 
-An existing screening instrument to detect condition X is to be translated and validated for use in Sri Lanka. The reported sensitivity and specificity of this instrument are 90% and 85%, respectively. The research team has access to patients undergoing the diagnostic test. Usually, about 50% of those undergoing the diagnostic test are found to have condition X.\
-Could you please help the research team calculate the sample size for this validation study?
+An existing screening instrument to detect condition X is to be translated and validated for use in Sri Lanka. The reported sensitivity and specificity of this instrument are 90% and 85%, respectively. The research team has access to patients undergoing the diagnostic test. Usually, about 50% of those undergoing the diagnostic test are found to have condition X.  
+What should be the sample size for this validation study?
