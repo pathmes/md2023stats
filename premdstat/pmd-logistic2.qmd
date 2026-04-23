@@ -1,0 +1,473 @@
+---
+title: "Logistic Regression III & IV"
+format: 
+  clean-typst:
+    include-in-header: "custom.typ"
+    commands: [small-cite]
+execute: 
+  echo: false
+  warning: false    
+author:
+  - name: A Pathmeswaran
+    orcid: 0000-0003-4065-2639
+    email: pathmes@kln.ac.lk
+date: 2026-03-16
+date-format: long
+handout: false
+brand:
+  typography: 
+    fonts: 
+      - family: Roboto
+        weight: [100, 200, 300, 400, 500, 600, 700]
+        style: [normal, italic]
+        source: google
+    base: Roboto
+    headings: Roboto
+---
+
+```{r}
+#| label: loadPacks
+library(tidyverse)
+library(summarytools)
+library(gt)
+library(gtsummary)
+library(aod)
+library(texreg)
+library(rcompanion)
+# library(generalhoslem)
+```
+
+
+### Syllabus
+- Logistic regression model $\checkmark$
+- interpretation of coefficients for dichotomous & continuous variables $\checkmark$
+- Multiple logistic regression:  
+  a. Wald test $\checkmark$
+  b. Likelihood ratio test
+  c. Dummy variables $\checkmark$
+  d. Model building strategies
+  e. Goodness of fit tests
+  
+
+
+### Log likelihood ratio test
+- Log likelihood is a negative number
+- A model with a better fit will have a log likelyhood closer to zero
+$$LR = -2ln(\frac{L(m_1)}{L(m_2)})= 2(loglik(m_2) - loglik(m_1))$$
+
+
+### Definition - AIC
+
+::: callout-note
+## AIC - Akaike information criterion 
+
+$$\displaystyle \mathrm {AIC} \,=\,2k-2\ln({\hat {L}})$$
+k is the number of parameters in the model. 
+
+:::
+Lower values of $\displaystyle \mathrm -2\ln({\hat {L}})$ indicate better fit. As we add more parameters to the model the $\displaystyle \mathrm -2\ln({\hat {L}})$ tends to decrease. In the calculation of AIC, the addition of 2k penalises the inclusion of additional parameters to the model. 
+
+
+### Definition - BIC
+
+::: callout-note
+## BIC - Bayesian information criterion 
+
+$$\displaystyle \mathrm {BIC} =k\ln(n)-2\ln({\widehat {L}})$$
+k is the number of parameters in the model. 
+n is the sample size
+:::
+It can be seen that the penalty for additional parameters is higher for BIC than for AIC. 
+
+
+### Log likelihood test (predictor - education)
+
+```{r}
+load("C:/AP/MyR/lectures/PGIM2/MD_CM_2023/md2023stats/bwt.RData")
+bwt$lbw <- bwt$bw < 2500
+bwt$ht_cm <- bwt$height*100
+bwt$edu <- as.character(bwt$education)
+bwt$edu3 <- case_match(
+bwt$edu,
+c("TEC", "GDU", "PG", "1-5", "6-8") ~ "e1",
+c("8-10", "OL") ~ "e2",
+c("AL", "NONE" ) ~ "e3"
+)
+
+bwt$edu3[bwt$idn == 54] <- "e3"
+bwt$edu3[bwt$idn == 66] <- "e3"
+bwt$edu3[bwt$idn == 182] <- "e3"
+bwt$edu3[bwt$idn == 239] <- "e3"
+bwt$edu3[bwt$idn == 259] <- "e3"
+bwt$edu3[bwt$idn == 261] <- "e3"
+bwt$edu3[bwt$idn == 432] <- "e3"
+
+
+```
+
+
+#### Likelihood ratio test
+```{r}
+m5 <- glm(
+lbw ~ edu3,
+data = bwt,
+family = "binomial")
+
+logLik(m5)
+
+with(m5, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
+```
+### Pseudo R squared
+
+```{r}
+nagelkerke(m5)$Pseudo.R.squared.for.model.vs.null
+```
+
+### Maternal height and LBW
+
+```{r}
+m2 <- glm(
+  lbw ~ ht_cm, 
+  data = bwt, 
+  family = "binomial")
+
+gtsummary::tbl_regression(m2, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 24)
+
+
+```
+
+
+
+### Log likelihood test (predictor - height)
+
+
+```{r}
+
+logLik(m2)
+with(m2, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
+
+```
+### Pseudo R squared
+
+```{r}
+nagelkerke(m2)$Pseudo.R.squared.for.model.vs.null
+```
+### Comparison of edu and height as predictors
+
+**maternal edu**
+
+```{r}
+broom::glance(m5) |> tinytable::tt()
+```
+
+**maternal height**
+
+```{r}
+broom::glance(m2) |> tinytable::tt()
+```
+
+
+### LBW by Education & Maternal Height - Logistic Regression
+
+```{r}
+m6 <- glm(
+lbw ~ edu3 + ht_cm,
+data = bwt,
+family = "binomial")
+
+gtsummary::tbl_regression(m6, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 24)
+
+```
+### LBW by Education & Maternal Height - Logistic Regression - Coefficients
+
+```{r}
+cbind(beta = coef(m6), confint(m6))
+exp(cbind(OR = coef(m6), confint(m6)))
+```
+
+## Log likelihood test (predictors(height & education))
+
+### Likelihood ratio test
+```{r}
+
+logLik(m6)
+with(m6, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
+
+nagelkerke(m6)$Pseudo.R.squared.for.model.vs.null
+```
+
+
+
+### Other predictors
+
+```{r}
+bwt |> 
+  select(weight, midacir, fundht) |> 
+  tbl_summary(
+     type = all_continuous() ~ "continuous2",
+    statistic = all_continuous() ~ c("{median} ({p25}, {p75})", "{mean}, ({sd})")
+  ) |> 
+  as_gt() |> 
+tab_options(table.font.size = 24)
+```
+
+
+
+### Comparison of models
+
+```{r}
+m4 <- glm(
+lbw ~ weight,
+data = bwt,
+family = "binomial")
+
+m7 <- glm(
+lbw ~ midacir,
+data = bwt,
+family = "binomial")
+
+m8 <- glm(
+lbw ~ fundht,
+data = bwt,
+family = "binomial")
+
+```
+
+
+
+
+### Comparison (Fundal height +)
+
+```{r}
+f1 <- glm(
+lbw ~ fundht + ht_cm,
+data = bwt,
+family = "binomial")
+
+f2 <- glm(
+lbw ~ fundht + weight,
+data = bwt,
+family = "binomial")
+
+f3 <- glm(
+lbw ~ fundht + midacir,
+data = bwt,
+family = "binomial")
+```
+
+```{r}
+#| results = "asis"
+texreg(list(m8, f1, f2, f3))
+```
+
+### Pseudo R squared for a few models {.scrollable}
+
+```{r}
+nagelkerke(m8)$Models[1]
+nagelkerke(m8)$Pseudo.R.squared.for.model.vs.null
+
+nagelkerke(f1)$Models[1]
+nagelkerke(f1)$Pseudo.R.squared.for.model.vs.null
+
+nagelkerke(f2)$Models[1]
+nagelkerke(f2)$Pseudo.R.squared.for.model.vs.null
+
+nagelkerke(f3)$Models[1]
+nagelkerke(f3)$Pseudo.R.squared.for.model.vs.null
+```
+
+### Goodness of fit
+
+- p > 0.05 No evidence of poor fit
+```{r}
+
+
+m2$formula
+generalhoslem::logitgof(bwt$lbw, fitted(m2))
+
+m8$formula
+generalhoslem::logitgof(bwt$lbw, fitted(m8), g = 3)
+
+f2$formula
+generalhoslem::logitgof(bwt$lbw, fitted(f2))
+
+```
+
+
+
+
+## Is the improvement significant?
+### Should we add weight as a predictor?
+```{r}
+
+anova(m8, f2, test='LR')
+
+```
+
+## Is the improvement significant?
+### Should we add mid arm circumference as a predictor?
+```{r}
+
+anova(m8, f3, test='LR')
+
+```
+
+### LBW by Education & Maternal Height interaction - Logistic Regression
+
+```{r}
+m11 <- glm(
+lbw ~ edu3 * ht_cm,
+data = bwt,
+family = "binomial")
+
+gtsummary::tbl_regression(m11, exponentiate = TRUE)|> 
+  as_gt() |> 
+tab_options(table.font.size = 24)
+
+```
+
+
+### Modelling strategy
+- Depends on the outcome variable - 
+  - binary - logistic regression
+  - continuous - linear regression
+  - time to event - Cox model
+  
+- Decide on the predictors
+  - study hypothesis
+  - adjusting for possible confounding
+  - selection of variables is based on prior knowledge and the results of bivariate analysis
+  - avoid automatic selection methods
+  - recoding or tranforming of the predictors
+- look at model statistics
+  
+
+
+
+### Boys smoking and cough 
+```{r}
+source(here::here("premdstat", "bland_boys_cough.R"))
+
+    tbl_cross(t17l,
+              row = boys,
+              col = cough,
+              percent = c("row")) |> 
+  add_p() |> 
+  as_gt() |> 
+tab_options(table.font.size = 24)
+
+```
+
+### Parents smoking and cough among boys
+
+```{r}
+    tbl_cross(t17l,
+              row = parents,
+              col = cough,
+              percent = c("row")) |> 
+  add_p() |> 
+  as_gt() |> 
+tab_options(table.font.size = 24)
+```
+### Parents smoking and boys smoking
+
+```{r}
+    tbl_cross(t17l,
+              row = boys,
+              col = parents,
+              percent = c("column")) |> 
+  add_p() |> 
+  as_gt() |> 
+tab_options(table.font.size = 24)
+```
+### Cough vs boys smoking
+
+
+```{r}
+mbs <- glm(
+cough ~ boys,
+data = t17l,
+family = "binomial")
+
+broom::tidy(mbs) |> tinytable::tt() |> tinytable::format_tt(j = 2:4, digits = 3)
+
+wald.test(b = coef(mbs), Sigma = vcov(mbs), Terms = 2:4)
+```
+
+### Cough vs boys smoking - Model stats
+
+```{r}
+broom::glance(mbs)[c(1, 6, 2, 7)] |> tinytable::tt()
+broom::glance(mbs)[c(3, 4, 5, 8)]|> tinytable::tt()
+```
+
+### Cough vs parents smoking
+
+
+```{r}
+mps <- glm(
+cough ~ parents,
+data = t17l,
+family = "binomial")
+
+broom::tidy(mps) |> tinytable::tt() |> tinytable::format_tt(j = 2:4, digits = 3)
+
+wald.test(b = coef(mps), Sigma = vcov(mps), Terms = 2:3)
+```
+
+### Cough vs parents smoking - Model stats
+
+```{r}
+broom::glance(mps)[c(1, 6, 2, 7)] |> tinytable::tt()
+broom::glance(mps)[c(3, 4, 5, 8)]|> tinytable::tt()
+```
+
+### Cough vs boys & parents smoking
+
+
+```{r}
+ms2 <- glm(
+cough ~ boys + parents,
+data = t17l,
+family = "binomial")
+
+broom::tidy(ms2) |> tinytable::tt() |> tinytable::format_tt(j = 2:4, digits = 3)
+wald.test(b = coef(ms2), Sigma = vcov(ms2), Terms = 2:4)
+wald.test(b = coef(ms2), Sigma = vcov(ms2), Terms = 5:6)
+
+```
+
+### Cough vs boys & parents smoking - Model stats
+
+```{r}
+broom::glance(ms2)[c(1, 6, 2, 7)] |> tinytable::tt()
+broom::glance(ms2)[c(3, 4, 5, 8)]|> tinytable::tt()
+```
+
+### Cough vs boys & parents smoking (interaction)
+
+
+```{r}
+ms2i <- glm(
+cough ~ boys * parents,
+data = t17l,
+family = "binomial")
+
+broom::tidy(ms2i) |> tinytable::tt() |> tinytable::format_tt(j = 2:4, digits = 3)
+wald.test(b = coef(ms2i), Sigma = vcov(ms2i), Terms = 2:4)
+wald.test(b = coef(ms2i), Sigma = vcov(ms2i), Terms = 5:6)
+wald.test(b = coef(ms2i), Sigma = vcov(ms2i), Terms = 7:12)
+
+```
+
+### Cough vs boys & parents smoking i - Model stats
+
+```{r}
+broom::glance(ms2i)[c(1, 6, 2, 7)] |> tinytable::tt()
+broom::glance(ms2i)[c(3, 4, 5, 8)]|> tinytable::tt()
+```
+
