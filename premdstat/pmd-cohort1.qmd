@@ -1,0 +1,360 @@
+---
+title: "Analysis of Cohort Studies I & II	"
+format: 
+  clean-typst:
+    include-in-header: "custom.typ"
+    commands: [small-cite]
+execute: 
+  echo: false
+  warning: false    
+author:
+  - name: A Pathmeswaran
+    orcid: 0000-0003-4065-2639
+    email: pathmes@kln.ac.lk
+date: 2026-04-02
+date-format: long
+bibliography: [static/references.bib]
+bibliographystyle: "apa"
+handout: false
+---
+
+```{r}
+#| label: loadPacks
+
+# library(ggdag)
+library(tinytable)
+# library(tidyverse)
+# library(aod)
+# library(summarytools)
+# library(gt)
+# library(gtsummary)
+# suppressPackageStartupMessages(library(kableExtra))
+
+
+```
+
+### Syllabus
+
+-   Relative Risk (RR) Attributable Risk (AR)\
+-   Incidence Rate Ratio (IRR) Incidence Rate Difference (IRD)
+-   Attributable Risk % (AR%) Population Attributable Risk (PAR) Population Attributable Risk Percent (PAR%)
+-   Preventable fraction\
+-   Calculation of 95% CIs
+    -   Mantel-Haenszel method
+    -   Test-based method
+-   Calculation of AR & PAR% in case-control studies
+
+### Closed vs Open Cohorts
+
+**Calculation of incidence rate**
+
+-   Numerator = Number of cases during the follow-up period
+-   Denominator
+    -   Closed cohort - Number at the start of follow-up
+    -   Open cohort - person time
+
+### Q1
+
+```{r}
+source(here::here("dmacm.R"))
+tinytable::tt(dmacm, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white")
+```
+
+The data is from a cohort study [@kasturiratne2020]. It shows the association between baseline diabetes status and mortality over 10 years of follow-up.
+
+-   Calculate the following
+    -   Relative risk
+    -   Attributable risk
+
+### Relative Risk
+
+$$\text{Relative Risk} = \frac{\text{Frequency among the exposed}}{\text{Frequency among the unexposed}}$$
+
+-   Frequency
+
+    -   Incidence or Mortality
+
+-   Range for RR: 0 to inf
+
+-   RR = 1 No association
+
+-   RR \> 1 Exposure is positively related to outcome.
+
+-   RR \< 1 Exposure protects against outcome (Vaccination and disease)
+
+### Risk Difference
+
+-   Attributable risk – Rate of disease in the exposed that can be attributed to the exposure
+
+$$\text{Attributable Risk}_{(exp)} = 
+            \text{Incidence}_{(exp)} - \text{Incidence}_{(unexp)}$$
+
+-   Population excess rate - Rate of disease in the population that can be attributed to the exposure
+
+$$\text{Population excess rate} =
+            \text{Incidence}_{(pop)} - \text{Incidence}_{(unexp)}$$
+
+### Relative Risk vs Attributable Risk
+
+-   Relative Risk
+    -   Strength of association
+    -   Aetiology
+
+{{< v 2em >}}
+
+-   Population excess rate
+    -   Used in planning/management
+    -   Estimate absolute numbers
+
+{{< v 2em >}}
+
+-   Attributable Risk ($\text{Attributable Risk}_{(exp)}$)
+
+### Assumptions underlying statistical methods
+
+- Independence of outcome
+  - Within a group, Knowing the outcome status of one group member does not provide any information regarding the outcome status of another group member.
+- Homogeneity of risk
+  - Within a group, all person time units have the same risk or probability of outcome. $\text{2 persons}\times{\text{50 years}} = \text{20 persons}\times{\text{5 years}}$
+  - Members of a group have identical risk.
+  
+
+### Calculation of 95% CI
+#### Person-Time  data 
+
+```{r}
+tinytable::tt(t141, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white")
+
+```
+- Incidence Rate - $I1 = A1/T1$ ; $I0 = A0/T0$  
+
+- Incidence Ratio - $IR  = I1/I0 = \frac{A1/T1}{A0/T0}$  
+
+- Incidence Difference - $ID = I1 - I0 ={A1/T1} - {A0/T0}$
+
+
+### Calculation of 95% CI
+#### Person-Time  data 
+
+```{r}
+tinytable::tt(t141, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white")
+
+```
+
+- Incidence Ratio - $IR  = I1/I0 = \frac{A1/T1}{A0/T0}$  
+
+When the null hypothesis is true, I1 = I0.    
+- E the average number of exposed cases is $E = M\times T1/T$
+
+- V the variance of A1 is $V = \frac{E \times T0}{T} = \frac{M \times T1 \times T0}{T^2}$  
+
+
+$$X~score = \frac{A1 - E}{\sqrt V}$$
+
+### Calculation of 95% CI
+#### Person-Time  data 
+
+```{r}
+tinytable::tt(t141, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white")
+
+```
+
+$$SE[ln(IR)] = \sqrt{(\frac{1}{A1} + \frac{1}{A0})}$$
+
+$$SE(ID) = \sqrt{(\frac{A1}{T1^2} + \frac{A0}{T0^2})}$$
+
+### Breast cancer following multiple exposure to radiation among patients with TB (Table 14-2 Rothman)
+
+{{< v 2em >}}
+
+```{r}
+tinytable::tt(t142, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white") |> 
+  tinytable::format_tt(j= 2:4, digits = 3, num_mark_big =  " ")
+
+```
+
+Calculate -   
+
+1. IR
+2. ID
+3. $X~score$
+4. SE[ln(IR)] and the 95% CI for IR
+5. SE(ID) and the 95% CI for ID
+
+### Breast cancer following multiple exposure to radiation among patients with TB (Table 14-2) - Answers 1, 2, 3
+
+{{< v 2em >}}
+
+```{r}
+tinytable::tt(t142, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white") |> 
+  tinytable::format_tt(j= 2:4, digits = 3, num_mark_big =  " ")
+
+```
+
+Answers -   
+
+1. $IR = \frac{41/28,010}{15/19,017} = 1.86$
+2. ID = 67.5 per 100 000 years
+3. X~score 
+  - $E = \frac{56(28,010)}{47, 027} = 33.35$
+  - $V = \frac{33.35(19,017)}{47, 027} = 13.49$
+  - $X~score = \frac{41 - 33.35}{\sqrt 13.49}$
+
+### Breast cancer following multiple exposure to radiation among patients with TB (Table 14-2) - Answers 4, 5
+
+{{< v 2em >}}
+
+```{r}
+tinytable::tt(t142, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white") |> 
+  tinytable::format_tt(j= 2:4, digits = 3, num_mark_big =  " ")
+
+```
+
+Answers 
+
+- $SE[ln(IR)] =  \sqrt{(\frac{1}{41} + \frac{1}{15})} = 0.302$
+- 95% CI for ln(IR) = $ln(1.86) \pm 1.96(0.302)$
+- 95% CI for IR = $exp[ln(1.86) \pm 1.96(0.302)] = \text{1.03 to 3.35}$
+
+{{< v 1em >}}
+
+- $SE(ID) = \sqrt{(\frac{41}{28,010^2} + \frac{15}{19,017^2})} = $ 30.6 per 100,000 years
+- 95% CI for ID = $67.5 \pm 1.96(30.6) = \text{7.5 to 127.5}$ per 100,000 years
+
+
+
+
+### Calculation of 95% CI
+#### Count  data 
+
+```{r}
+
+tinytable::tt(t143, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white")
+
+```
+- Risk - $R1 = A1/N1$ ; $R0 = A0/N0$  
+
+- Risk Ratio - $RR  = R1/R0 = \frac{A1/N1}{A0/N0}$  
+
+- Risk Difference - $RD = R1 - R0 ={A1/N1} - {A0/N0}$
+
+
+### Calculation of 95% CI
+#### Count  data 
+
+```{r}
+
+tinytable::tt(t143, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white")
+
+```
+- Risk Ratio - $RR  = R1/R0 = \frac{A1/N1}{A0/N0}$  
+
+- If R1 = R0, the average number of exposed cases (E) when the total cases is M1 - E = M1N1/N
+- Variance of A = V
+  - $V = \frac{EM0N0}{N(N-1)} =  \frac{M1N1M0N0}{N^2(N-1)}$
+  
+- $X~score = \frac{A1 - E}{\sqrt V}$
+ 
+### Calculation of 95% CI
+#### Count  data 
+
+```{r}
+
+tinytable::tt(t143, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white")
+
+```
+
+$$SE[ln(RR)] = \sqrt{(\frac{1}{A1} - \frac{1}{N1} +
+\frac{1}{A0} - \frac{1}{N0} )}$$
+
+$$SE(RD) = \sqrt{(\frac{A1B1}{N1^2(N1 - 1)} + \frac{A0B0}{N0^2(N0 - 1)})}$$
+
+### Antibodies in breast milk and diarrea in infants (14-4)
+
+```{r}
+tinytable::tt(t144, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white")
+```
+
+Calculate -   
+
+1. RR
+2. RD
+3. $X~score$
+4. SE[ln(RR)] and the 95% CI for RR
+5. SE(RD) and the 95% CI for RD
+
+
+### Diarrhea in infants 
+
+```{r}
+
+tinytable::tt(t144, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white")
+
+```
+- Risk Ratio - $RR  = R1/R0 = \frac{A1/N1}{A0/N0}$  
+
+-  E = M1N1/N
+- $V = \frac{EM0N0}{N(N-1)} =  \frac{M1N1M0N0}{N^2(N-1)}$
+  
+- $X~score = \frac{A1 - E}{\sqrt V}$
+ 
+### Diarrhea in infants 
+
+
+```{r}
+
+tinytable::tt(t144, rownames = TRUE) |> 
+  tinytable::style_tt(j = 2:4, align = "r") |> 
+  tinytable::style_tt(j = 1, i = 0, color = "white")
+
+```
+
+$$SE[ln(RR)] = \sqrt{(\frac{1}{A1} - \frac{1}{N1} +
+\frac{1}{A0} - \frac{1}{N0} )}$$
+
+$$SE(RD) = \sqrt{(\frac{A1B1}{N1^2(N1 - 1)} + \frac{A0B0}{N0^2(N0 - 1)})}$$
+
+
+### Attributable fraction in case control studies
+
+Exposure Attributable Fraction (EAF)  = $\frac{OR - 1}{OR}$
+
+Population Attributable Fraction (PAF) = $\frac{P \times (OR - 1)}{P \times (OR - 1) + 1}$
+
+P - prevalence of exposure in the base population
+
+### Questions
+
+1. Is SMR (standardised mortality ratio) a rate ratio?
+2. Are these two formulae the same  
+$$SE(RD) = \sqrt{(\frac{A1B1}{N1^2(N1 - 1)} + \frac{A0B0}{N0^2(N0 - 1)})}$$  
+
+$$SE_{diff} = \sqrt{\frac{p_1q_1}{n_1}+\frac{p_2q_2}{n_2}}$$
+
+
+
+### References
