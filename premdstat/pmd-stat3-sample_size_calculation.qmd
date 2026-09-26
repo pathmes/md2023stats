@@ -6,6 +6,7 @@ author:
   - name: A Pathmeswaran
     orcid: 0000-0003-4065-2639
     email: pathmes@kln.ac.lk
+    affiliations: University of Kelaniya
 date: 2026-02-13
 date-format: long
 bibliography: [static/references.bib]
@@ -45,7 +46,7 @@ brand:
 #| include: false
 library(tinytable)
 library(tinyplot)
-source(here::here("sim_sample_V1.0.R"))
+source(here::here("sim_sample_V1.1.R"))
 
 ```
 
@@ -65,7 +66,10 @@ plt(a,
     sub = paste0("Mean = ", round(mean(a),1),
                  "; SD = ", round(sd(a),1),
                  "; Min = ", min(a),
-                 "; Max = ", max(a)), cex.sub = 2
+                 "; Max = ", max(a)),
+     theme = list("basic",
+                 cex.sub = 1.5, cex.lab = 1.2
+     )
      ) 
 ```
 
@@ -87,8 +91,9 @@ plt(r64100,
                   "SD of sample means = ", round(sd(r64100),2),
                   ";  ",
                   "Size of samples = 64"),
-     xlab = NULL,
-     cex.sub = 1.5)
+     xlab = "",
+    theme = list("basic",
+                 cex.sub = 1.5, cex.lab = 1.2))
 ```
 
 ### Samples of size 64
@@ -103,7 +108,7 @@ format_tt(j = 2:5, fn = function(x) sprintf("%.1f", x)) |>
 ```
 
 What will be the minimum value of the sample means if we repeat this process **1000** times?\
-It will be\
+It is most likely to be\
 1. Lower than 45.0\
 2. Higher than 45.0\
 3. Cannot be predicted
@@ -122,7 +127,9 @@ plt(r641000,
              ";  Minimum = ", round(min(r641000),1),
              ";  Maximum = ", round(max(r641000),1)
              ),
-     xlab = "")
+     xlab = "",
+    theme = list("basic",
+                 cex.sub = 1.5, cex.lab = 1.2))
 
 ```
 
@@ -150,7 +157,7 @@ tt(s64r100, width = .8) |>
 ```
 
 What will be the minimum value of the sample means if we repeat this process 100 times with a sample size of **256**?\
-It will be\
+It is most likely to be\
 1. Lower than 45.0\
 2. Higher than 45.0\
 3. Cannot be predicted
@@ -169,7 +176,9 @@ plt(r256100,
                   "SD of sample means = ", round(sd(r256100),2),
                   ";  ",
                   "Size of samples = 256"),
-     xlab = "")
+     xlab = "",
+    theme = list("basic",
+                 cex.sub = 1.5, cex.lab = 1.2))
 ```
 
 ### Sample size 256 & repetitions 100
@@ -423,6 +432,7 @@ We expected the 2-week treatment to increase the eradication rate from 60% to 90
 -   Clinical trial protocols\
 -   Online calculator for a few common situations - [Online calculator](https://pathmes.github.io/Sample-Size-Home/)\
 -   Introduction to sample size calculation - [My sample size website](https://pathmes.quarto.pub/sample-size-calculation/)
+- [My guide to calculating sample size in OpenEpi](https://pathmes.quarto.pub/sample-size-calculation/openepi.html)
 
 ### References
 
